@@ -1,5 +1,7 @@
 package me._xGQD.CapTheFlag.Commands;
 
+import java.util.ArrayList;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -7,8 +9,10 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 import me._xGQD.CapTheFlag.Main;
 import me._xGQD.CapTheFlag.Functions;
@@ -58,6 +62,7 @@ public class CTFCommand implements CommandExecutor{
 				    			}
 				    		}
 				    		plugin.gold.put(player.getUniqueId(), 0);
+				    		plugin.buffs.put(player.getUniqueId(), new ArrayList<String>());
 				    		plugin.boards.get(player.getUniqueId()).updateLine(3, "Gold: " + 0);;
 			    		}else {
 			    			player.sendMessage("The game is not open");
@@ -128,8 +133,8 @@ public class CTFCommand implements CommandExecutor{
 		        		return true;
 		        	}
 		        	Player player2 = (Player) sender;
-		        	Inventory shop = Bukkit.createInventory(player2, 9);
 		        	
+		        	player2.openInventory(plugin.shop);
 		        	break;
 		        default:
 		        	sender.sendMessage("That command does not exist");

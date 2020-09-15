@@ -18,6 +18,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import me._xGQD.Duels.InventoryStringDeSerializer;
 import me._xGQD.Duels.Main;
 
 public class DuelsCommand implements CommandExecutor{
@@ -74,21 +75,14 @@ public class DuelsCommand implements CommandExecutor{
 				}
 				switch(subsubcmd) {
 					case "create":
-						Inventory inventory = player.getInventory();
-						String serialization = inventory.getSize() + ";";
-						if(!config.contains("Gamemodes")) {
-							config.createSection("Gamemodes");
-						}
-						ConfigurationSection gamemodes = config.getConfigurationSection("Gamemodes");
-						
-						for(int i = 0; i < inventory.getSize(); i++) {
-							ItemStack is = inventory.getItem(i);
-							if(is != null) {
-								
-							}else {
+						if(args.length == 3) {
+							if(!config.contains("Gamemodes")) {
+								config.createSection("Gamemodes");
 							}
-						}
+							ConfigurationSection gamemodes = config.getConfigurationSection("Gamemodes");
 							
+							gamemodes.set(args[3], InventoryStringDeSerializer.InventoryToString(player.getInventory()));
+						}
 				}
 					
 			case "ar":
@@ -124,8 +118,6 @@ public class DuelsCommand implements CommandExecutor{
 						}
 						plugin.saveConfig();
 						break;
-					case "gamemode":
-						if(args.length == 4) {}
 					case "create":
 						if(args.length == 3) {
 							if(plugin.pos1[0] == -1 || plugin.pos2[0] == -1) {

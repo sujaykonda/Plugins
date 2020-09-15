@@ -16,10 +16,12 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -67,6 +69,45 @@ public class PositionListener implements Listener{
         }
     }
 	
+	@EventHandler
+	public void onInventoryClick(InventoryClickEvent event) {
+		Player player = (Player) event.getWhoClicked(); // The player that clicked the item
+		ItemStack clicked = event.getCurrentItem(); // The item that was clicked
+		Inventory inventory = event.getInventory(); // The inventory that was clicked in
+		if (inventory.getName().equals(plugin.shop.getName())) { // The inventory is our custom Inventory
+			if (clicked.getType() == Material.IRON_CHESTPLATE) { // The item that the player clicked it dirt
+				event.setCancelled(true); // Make it so the dirt is back in its original spot
+				player.closeInventory(); // Closes there inventory
+				if (plugin.gold.get(player.getUniqueId()) > 100) {
+					plugin.gold.put(player.getUniqueId(), plugin.gold.get(player.getUniqueId())-100);
+					player.getInventory().setBoots(new ItemStack(Material.IRON_BOOTS));
+					player.getInventory().setLeggings(new ItemStack(Material.IRON_LEGGINGS));
+					player.getInventory().setChestplate(new ItemStack(Material.IRON_CHESTPLATE));
+				}
+			}
+			if (clicked.getType() == Material.DIAMOND_SWORD) {
+				event.setCancelled(true); // Make it so the dirt is back in its original spot
+				player.closeInventory(); // Closes there inventory
+				if (plugin.gold.get(player.getUniqueId()) > 50) {
+					plugin.gold.put(player.getUniqueId(), plugin.gold.get(player.getUniqueId())-50);
+					player.getInventory().setItem(0, new ItemStack(Material.DIAMOND_SWORD));
+				}
+			}
+			if(clicked.getType() == Material.GOLD_SWORD) {
+				event.setCancelled(true); // Make it so the dirt is back in its original spot
+				player.closeInventory(); // Closes there inventory
+				plugin.buffs.get(player.getUniqueId());
+				Functions.ReadBuffs(player, plugin);
+			}
+			if(clicked.getType() == Material.CHAINMAIL_CHESTPLATE) {
+				event.setCancelled(true); // Make it so the dirt is back in its original spot
+				player.closeInventory(); // Closes there inventory
+				plugin.buffs.get(player.getUniqueId());
+				Functions.ReadBuffs(player, plugin);
+			}
+		}
+	}
+	
 	@EventHandler 
 	public void onBlockPlace(BlockPlaceEvent event){
 		if((plugin.start || plugin.open) && (plugin.team_1.contains(event.getPlayer().getUniqueId()) || plugin.team_2.contains(event.getPlayer().getUniqueId()))) {
@@ -112,7 +153,8 @@ public class PositionListener implements Listener{
 			if((plugin.start || plugin.open) && (plugin.team_1.contains(player.getUniqueId()) || plugin.team_2.contains(player.getUniqueId()))) {
 				Player p = e.getEntity().getKiller();
 				FastBoard board = plugin.boards.get(p.getUniqueId());
-				board.updateLine(3, "Gold: " + (plugin.gold.get(p.getUniqueId()) + 10));
+				plugin.gold.put(p.getUniqueId(), plugin.gold.get(p.getUniqueId()) + 10);
+				board.updateLine(3, "Gold: " + plugin.gold.get(p.getUniqueId()));
 				p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 60, 3));
 				p.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 100, 0));
 			}

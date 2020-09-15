@@ -1,8 +1,11 @@
 package me._xGQD.CapTheFlag;
 
+import java.util.List;
+
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
@@ -78,6 +81,7 @@ public class Functions {
 		player.getInventory().setItem(0, sword);
 		player.getInventory().setItem(1, glass);
 		player.getInventory().setItem(2, steak);
+		ReadBuffs(player, plugin);
 	}
 	
 	public static void GivePlayerBlue(Player player, Main plugin) {
@@ -116,5 +120,22 @@ public class Functions {
 		player.getInventory().setItem(0, sword);
 		player.getInventory().setItem(1, glass);
 		player.getInventory().setItem(2, steak);
+		ReadBuffs(player, plugin);
+	}
+	
+	public static void ReadBuffs(Player player, Main plugin) {
+		List<String> playerbuffs = plugin.buffs.get(player.getUniqueId());
+		for(String string : playerbuffs) {
+			if(string.equalsIgnoreCase("permsword")) {
+				ItemStack permsword = new ItemStack(Material.GOLD_SWORD);
+				permsword.addEnchantment(Enchantment.DAMAGE_ALL, 1);
+				player.getInventory().setItem(0, permsword);
+			}
+			if(string.equalsIgnoreCase("permarmor")) {
+				player.getInventory().setBoots(new ItemStack(Material.CHAINMAIL_BOOTS));
+				player.getInventory().setBoots(new ItemStack(Material.CHAINMAIL_LEGGINGS));
+				player.getInventory().setBoots(new ItemStack(Material.CHAINMAIL_CHESTPLATE));
+			}
+		}
 	}
 }

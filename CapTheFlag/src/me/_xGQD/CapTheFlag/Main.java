@@ -8,8 +8,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Statistic;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import me._xGQD.CapTheFlag.Commands.CTFCommand;
@@ -27,13 +32,27 @@ public class Main extends JavaPlugin{
 	
 	public final Map<UUID, FastBoard> boards = new HashMap<>();
 	public final Map<UUID, Integer> gold = new HashMap<>();
-	
+	public final Map<UUID, List<String>> buffs = new HashMap<>();
+	public Inventory shop;
 	// Fired when plugin is first enabled
     @Override
     public void onEnable() {
     	
     	new CTFCommand(this);
     	new PositionListener(this);
+    	
+    	shop = Bukkit.createInventory(null, 9);
+    	
+    	ItemStack permchain = new ItemStack(Material.CHAINMAIL_CHESTPLATE);
+    	ItemStack permsword = new ItemStack(Material.GOLD_SWORD);
+    	ItemStack sword = new ItemStack(Material.DIAMOND_SWORD);
+    	ItemStack iron = new ItemStack(Material.IRON_CHESTPLATE);
+    	permsword.addEnchantment(Enchantment.DAMAGE_ALL, 1);
+    	
+    	shop.setItem(0, permchain);
+    	shop.setItem(2, permsword);
+    	shop.setItem(4, iron);
+    	shop.setItem(6, sword);
     	
     	getServer().getScheduler().runTaskTimer(this, () -> {
             for (FastBoard board : boards.values()) {
