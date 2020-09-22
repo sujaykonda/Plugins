@@ -189,6 +189,10 @@ public class PositionListener implements Listener{
 			Player player = (Player) event.getEntity();
 			GameMap map = plugin.getMap(player);
 			if(map != null) {
+				boolean isDied = false;
+				if(event.getCause() == DamageCause.LAVA) {
+					isDied = true;
+				}
 				if (event instanceof EntityDamageByEntityEvent) {
 					EntityDamageByEntityEvent e = (EntityDamageByEntityEvent) event;
 					if(e.getDamager() instanceof Player) {
@@ -205,7 +209,7 @@ public class PositionListener implements Listener{
 						}
 					}
 				}
-				if(event.getDamage() > player.getHealth()){
+				if(event.getDamage() > player.getHealth() || isDied){
 					if(map.lastHit.containsKey(player.getUniqueId())) {
 						Player damagePlayer = map.lastHit.get(player.getUniqueId());
 						FastBoard board = plugin.boards.get(damagePlayer.getUniqueId());
