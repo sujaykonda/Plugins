@@ -154,6 +154,7 @@ public class GameMap {
 			if(string.equalsIgnoreCase("permsword")) {
 				ItemStack permsword = new ItemStack(Material.GOLD_SWORD);
 				permsword.addEnchantment(Enchantment.DAMAGE_ALL, 2);
+				permsword.addEnchantment(Enchantment.DURABILITY, 3);
 				player.getInventory().setItem(0, permsword);
 			}
 			if(string.equalsIgnoreCase("permarmor")) {
