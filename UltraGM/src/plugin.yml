@@ -1,0 +1,7 @@
+name: UltraGamemodes
+version: 0.1.0
+author: _xGQD
+main: me._xGQD.ultragm.Main
+commands:
+  ug:
+    description: This is the base command for UltraGamemodes

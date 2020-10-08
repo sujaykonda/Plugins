@@ -22,6 +22,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.Potion;
+import org.bukkit.potion.PotionType;
 
 import me._xGQD.CapTheFlag.Classes.GameMap;
 import me._xGQD.CapTheFlag.Commands.CTFCommand;
@@ -36,6 +38,9 @@ public class Main extends JavaPlugin{
 	public final Map<UUID, Integer> gold = new HashMap<>();
 	public final Map<UUID, List<String>> buffs = new HashMap<>();
 	public Inventory shop;
+	public Inventory ultimatePerks;
+	public String[] allPerks = {"kbperk", "goldperk", "hasteperk", "tpperk", "rodperk", "defenseperk", "rushperk"};
+	public Set<UUID> epearlcooldown = new HashSet<>();
 	public FileConfiguration config;
 	// Fired when plugin is first enabled
     @Override
@@ -57,6 +62,7 @@ public class Main extends JavaPlugin{
     	new PositionListener(this);
     	
     	shop = Bukkit.createInventory(null, 9);
+    	ultimatePerks = Bukkit.createInventory(null, 18);
     	
     	ItemStack permchain = new ItemStack(Material.CHAINMAIL_CHESTPLATE);
     	ItemStack permsword = new ItemStack(Material.GOLD_SWORD);
@@ -133,6 +139,67 @@ public class Main extends JavaPlugin{
     	shop.setItem(4, haste);
     	shop.setItem(5, rod);
     	shop.setItem(6, snow);
+    	
+    	
+    	ItemStack kbperk = new ItemStack(Material.IRON_SWORD);
+    	ItemStack goldperk = new ItemStack(Material.GOLD_INGOT);
+    	ItemStack tpperk = new ItemStack(Material.ENDER_PEARL);
+    	ItemStack defenderperk = new ItemStack(Material.SNOW_BLOCK);
+    	ItemStack rushperk = new ItemStack(Material.POTION);
+    	ItemStack randomperk = new ItemStack(Material.COMPASS);
+    	
+    	kbperk.addEnchantment(Enchantment.KNOCKBACK, 1);
+    	
+    	@SuppressWarnings("deprecation")
+		Potion potion = new Potion(PotionType.SPEED, 1, true);
+    	potion.apply(rushperk);    	
+    	
+    	ItemMeta kbperkmeta = goldperk.getItemMeta();
+    	kbperkmeta.setDisplayName("Knockback Perk");
+    	List<String> kbperklore = new ArrayList<String>();
+    	kbperklore.add("Adds Knockback 1 To All Your Swords");
+    	kbperklore.add("Ultimate Perk");
+    	kbperkmeta.setLore(kbperklore);
+    	kbperk.setItemMeta(kbperkmeta);
+    	
+    	ItemMeta tpperkmeta = tpperk.getItemMeta();
+    	tpperkmeta.setDisplayName("Time Warp Perk");
+    	List<String> tpperklore = new ArrayList<String>();
+    	tpperklore.add("Gives Time Warp Pearls");
+    	tpperklore.add("Ultimate Perk");
+    	tpperkmeta.setLore(tpperklore);
+    	tpperk.setItemMeta(tpperkmeta);
+
+    	ItemMeta defenderperkmeta = defenderperk.getItemMeta();
+    	defenderperkmeta.setDisplayName("Defender Perk");
+    	List<String> defenderperklore = new ArrayList<String>();
+    	defenderperklore.add("Gives Snow Blocks At Start Pearls");
+    	defenderperklore.add("Ultimate Perk");
+    	defenderperkmeta.setLore(defenderperklore);
+    	defenderperk.setItemMeta(defenderperkmeta);
+
+    	ItemMeta rushperkmeta = rushperk.getItemMeta();
+    	rushperkmeta.setDisplayName("Rush Perk");
+    	List<String> rushperklore = new ArrayList<String>();
+    	rushperklore.add("Gives Speed Pot");
+    	rushperklore.add("Ultimate Perk");
+    	rushperkmeta.setLore(rushperklore);
+    	rushperk.setItemMeta(rushperkmeta);
+
+    	ItemMeta randomperkmeta = randomperk.getItemMeta();
+    	randomperkmeta.setDisplayName("Random Perk");
+    	List<String> randomperklore = new ArrayList<String>();
+    	randomperklore.add("Gives You A Random Perk");
+    	randomperklore.add("Ultimate Perk");
+    	randomperkmeta.setLore(randomperklore);
+    	randomperk.setItemMeta(randomperkmeta);
+
+    	ultimatePerks.setItem(0, kbperk);
+    	ultimatePerks.setItem(1, goldperk);
+    	ultimatePerks.setItem(2, tpperk);
+    	ultimatePerks.setItem(3, defenderperk);
+    	ultimatePerks.setItem(4, rushperk);
+    	ultimatePerks.setItem(5, randomperk);
     	
     	getServer().getScheduler().runTaskTimer(this, () -> {
             for (FastBoard board : boards.values()) {

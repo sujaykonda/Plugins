@@ -16,8 +16,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.potion.Potion;
+import org.bukkit.potion.PotionBrewer;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.potion.PotionType;
 
 import me._xGQD.CapTheFlag.Main;
 import me._xGQD.CapTheFlag.FastBoard.FastBoard;
@@ -34,6 +37,8 @@ public class GameMap {
 	public Set<UUID> spawn_prot = new HashSet<UUID>();
 	public boolean start = false;
 	public boolean open = false;
+	public boolean isUltimate = false;
+	public Set<UUID> istimewarp = new HashSet<UUID>();
 	public String name;
 	
 	public GameMap(String name, Location spawn_loc_1, Location spawn_loc_2) {
@@ -147,7 +152,17 @@ public class GameMap {
 		this.ReadBuffs(player, plugin);
 			
 	}
-	
+	public void StartingReadBuffs(Player player, Main plugin) {
+		List<String> playerbuffs = plugin.buffs.get(player.getUniqueId());
+		for(String string : playerbuffs) {
+			if(string.equalsIgnoreCase("goldperk")) {
+	    		plugin.gold.put(player.getUniqueId(), 30);
+			}
+			if(string.equalsIgnoreCase("defenseperk")) {
+				player.getInventory().setItem(3, new ItemStack(Material.SNOW_BLOCK, 20));
+			}
+		}
+	}
 	public void ReadBuffs(Player player, Main plugin) {
 		List<String> playerbuffs = plugin.buffs.get(player.getUniqueId());
 		for(String string : playerbuffs) {
@@ -165,6 +180,18 @@ public class GameMap {
 			if(string.equalsIgnoreCase("haste")) {
 				player.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 9999999, 3));
 			}
+			if(string.equalsIgnoreCase("kbperk")) {
+				ItemStack kbsword = player.getInventory().getItem(0);
+				kbsword.addEnchantment(Enchantment.KNOCKBACK, 1);
+				player.getInventory().setItem(0, kbsword);
+			}
+			if(string.equalsIgnoreCase("tpperk")) {
+				player.getInventory().setItem(3, new ItemStack(Material.ENDER_PEARL));
+			}
+			if(string.equalsIgnoreCase("defenseperk")) {
+				player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 9999999, 0));
+				player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 9999999, 0));
+			}
 		}
 	} 
 	public void End(Main plugin) {
@@ -176,8 +203,16 @@ public class GameMap {
             		          "",
             		          "");
         }
+    	for(UUID key : team_1) {
+    		plugin.buffs.remove(key);
+    	}
+    	for(UUID key : team_2) {
+    		plugin.buffs.remove(key);
+    	}
 		this.team_1.clear();
 		this.team_2.clear();
+		this.istimewarp.clear();
+		this.spawn_prot.clear();
 	}
 	
 	public Location RoundLoc(Location location) {

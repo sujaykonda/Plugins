@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="UltraGM:jar">
+    <output-path>$PROJECT_DIR$/../../Servers/CapTheFlag/plugins</output-path>
+    <root id="archive" name="UltraGM.jar">
+      <element id="module-output" name="UltraGM" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../Servers/spigot-1.8.8.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

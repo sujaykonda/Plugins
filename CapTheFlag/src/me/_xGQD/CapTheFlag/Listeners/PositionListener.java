@@ -1,12 +1,16 @@
 package me._xGQD.CapTheFlag.Listeners;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
@@ -48,7 +52,6 @@ public class PositionListener implements Listener{
 		
 		Bukkit.getPluginManager().registerEvents(this, plugin);
 	}
-	
 	@EventHandler
     public void onJoin(PlayerJoinEvent e) {
         Player player = e.getPlayer();
@@ -156,13 +159,74 @@ public class PositionListener implements Listener{
 				
 				if(clicked.getType() == Material.SNOW_BLOCK) {
 					event.setCancelled(true); // Make it so the dirt is back in its original spot
-					player.closeInventory(); // Closes there inventory
 					if (plugin.gold.get(player.getUniqueId()) >= 5) {
 						plugin.gold.put(player.getUniqueId(), plugin.gold.get(player.getUniqueId())-5);
 				    	player.getInventory().addItem(new ItemStack(Material.SNOW_BLOCK));
 					}
 				}
 				plugin.boards.get(player.getUniqueId()).updateLine(3, "Gold: " + plugin.gold.get(player.getUniqueId()));
+			}
+		}
+		if (inventory.getName().equals(plugin.ultimatePerks.getName())) { // The inventory is our custom Inventory
+			if (clicked.getType() == Material.IRON_SWORD) { // The item that the player clicked it dirt
+				event.setCancelled(true); // Make it so the dirt is back in its original spot
+				player.closeInventory(); // Closes there inventory
+				List<String> buffs = plugin.buffs.get(player.getUniqueId());
+				buffs.add("kbperk");
+				plugin.buffs.put(player.getUniqueId(), buffs);
+				map.ReadBuffs(player, plugin);
+				
+			}
+			if (clicked.getType() == Material.GOLD_INGOT) {
+				event.setCancelled(true); // Make it so the dirt is back in its original spot
+				player.closeInventory(); // Closes there inventory
+				plugin.gold.put(player.getUniqueId(), plugin.gold.get(player.getUniqueId())+30);
+				List<String> buffs = plugin.buffs.get(player.getUniqueId());
+				buffs.add("goldperk");
+				plugin.buffs.put(player.getUniqueId(), buffs);
+				map.ReadBuffs(player, plugin);
+				
+			}
+			if(clicked.getType() == Material.ENDER_PEARL) {
+				event.setCancelled(true); // Make it so the dirt is back in its original spot
+				player.closeInventory(); // Closes there inventory
+				List<String> buffs = plugin.buffs.get(player.getUniqueId());
+				buffs.add("tpperk");
+				plugin.buffs.put(player.getUniqueId(), buffs);
+				map.ReadBuffs(player, plugin);
+				
+			}
+			
+			if(clicked.getType() == Material.SNOW_BLOCK) {
+				event.setCancelled(true); // Make it so the dirt is back in its original spot
+				player.closeInventory(); // Closes there inventory
+				List<String> buffs = plugin.buffs.get(player.getUniqueId());
+				buffs.add("defenseperk");
+				plugin.buffs.put(player.getUniqueId(), buffs);
+				map.ReadBuffs(player, plugin);
+				
+			}
+			
+			if(clicked.getType() == Material.POTION) {
+				event.setCancelled(true); // Make it so the dirt is back in its original spot
+				player.closeInventory(); // Closes there inventory
+				List<String> buffs = plugin.buffs.get(player.getUniqueId());
+				buffs.add("rushperk");
+				plugin.buffs.put(player.getUniqueId(), buffs);
+				map.ReadBuffs(player, plugin);
+				
+			}
+			
+			if(clicked.getType() == Material.COMPASS) {
+				event.setCancelled(true); // Make it so the dirt is back in its original spot
+				player.closeInventory(); // Closes there inventory
+				List<String> buffs = plugin.buffs.get(player.getUniqueId());
+				Random rand = new Random();
+				int n = rand.nextInt(plugin.allPerks.length);
+				buffs.add(plugin.allPerks[n]);
+				plugin.buffs.put(player.getUniqueId(), buffs);
+				map.ReadBuffs(player, plugin);
+				
 			}
 		}
 	}
@@ -214,10 +278,19 @@ public class PositionListener implements Listener{
 						Player damagePlayer = map.lastHit.get(player.getUniqueId());
 						FastBoard board = plugin.boards.get(damagePlayer.getUniqueId());
 						plugin.gold.put(damagePlayer.getUniqueId(), plugin.gold.get(damagePlayer.getUniqueId()) + 10);
+						if(plugin.buffs.containsKey(damagePlayer.getUniqueId())) {
+							if(plugin.buffs.get(damagePlayer.getUniqueId()).contains("goldperk")) {
+								plugin.gold.put(damagePlayer.getUniqueId(), plugin.gold.get(damagePlayer.getUniqueId()) + 5);
+							}
+						}
 						board.updateLine(3, "Gold: " + plugin.gold.get(damagePlayer.getUniqueId()));
 						damagePlayer.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 60, 3));
 						damagePlayer.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 100, 0));
-						
+						if(plugin.buffs.containsKey(damagePlayer.getUniqueId())) {
+							if(plugin.buffs.get(damagePlayer.getUniqueId()).contains("rushperk")) {
+								damagePlayer.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 60, 1));
+							}
+						}
 					}
 					map.lastHit.remove(player.getUniqueId());
 					event.setCancelled(true);
@@ -300,7 +373,33 @@ public class PositionListener implements Listener{
 		if(map != null) {
 			Action eventAction = event.getAction();
 			Player player = event.getPlayer();
-			if(eventAction == Action.RIGHT_CLICK_BLOCK || eventAction == Action.RIGHT_CLICK_AIR) {
+			Location loc = player.getLocation();
+			if(event.getMaterial() == Material.ENDER_PEARL) {
+				if(!plugin.epearlcooldown.contains(player.getUniqueId())) {
+					plugin.epearlcooldown.add(player.getUniqueId());
+					map.istimewarp.add(player.getUniqueId());
+		            Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable(){
+		                public void run(){
+		                	plugin.epearlcooldown.remove(player.getUniqueId());
+		                }
+		            }, 200);
+		            Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable(){
+		                public void run(){
+							map.istimewarp.remove(player.getUniqueId());
+		                	player.teleport(loc);
+		                	player.getInventory().addItem(new ItemStack(Material.ENDER_PEARL));
+		                }
+		            }, 100);
+				}else {
+					event.setCancelled(true);
+				}
+	        }
+			if(event.getPlayer().getItemInHand().getType() == Material.NETHER_STAR) {
+	        	Player player1 = event.getPlayer();
+	        	
+	        	player1.openInventory(plugin.shop);
+			}
+			if((eventAction == Action.RIGHT_CLICK_BLOCK || eventAction == Action.RIGHT_CLICK_AIR) && !map.istimewarp.contains(player.getUniqueId())) {
 				Block block = event.getPlayer().getTargetBlock((Set<Material>) null, 3);
 				if (block != null && block.getType() == Material.STANDING_BANNER) {
 					if(block.getData() == (byte) 8) {
@@ -384,11 +483,6 @@ public class PositionListener implements Listener{
 							}
 						}
 					}
-				}
-				if(event.getPlayer().getItemInHand().getType() == Material.NETHER_STAR) {
-		        	Player player1 = event.getPlayer();
-		        	
-		        	player1.openInventory(plugin.shop);
 				}
 			}
 		}
