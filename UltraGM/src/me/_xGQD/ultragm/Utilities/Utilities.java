@@ -36,15 +36,15 @@ public class Utilities {
     public static ItemStack createItem(Material mat, String displayName, String[] newLore){
         ItemStack item = new ItemStack(mat);
         ItemMeta meta;
-        if(item.hasItemMeta()){
-            meta = item.getItemMeta();
-            meta.setDisplayName(displayName);
-            List<String> lore = meta.getLore();
-            for(String loreLine: newLore){
-                lore.add(loreLine);
-            }
-            meta.setLore(lore);
-            item.setItemMeta(meta);
+        if(item.hasItemMeta()) {
+		    meta = item.getItemMeta();
+		    meta.setDisplayName(displayName);
+		    List<String> lore = meta.getLore();
+		    for(String loreLine: newLore){
+		        lore.add(loreLine);
+		    }
+		    meta.setLore(lore);
+		    item.setItemMeta(meta);
         }
         return item;
     }

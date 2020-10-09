@@ -435,9 +435,9 @@ public class CTFCommand implements CommandExecutor{
 		        		sender.sendMessage("Only players can execute this command");
 		        		return true;
 		        	}
-		        	Player player2 = (Player) sender;
+		        	Player player21 = (Player) sender;
 		        	
-		        	player2.openInventory(plugin.shop);
+		        	player21.openInventory(plugin.shop);
 		        	break;
 		        default:
 		        	sender.sendMessage("That command does not exist");

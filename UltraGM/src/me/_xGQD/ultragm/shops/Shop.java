@@ -36,9 +36,9 @@ public class Shop {
             boolean close = map.buy(player, event.getCurrentItem());
             if(close){
                 event.setCancelled(true);
+                player.closeInventory();
             }
         }
-        player.closeInventory();
     }
     public void onPlayerInteract(PlayerInteractEvent event){
         Player player = event.getPlayer();

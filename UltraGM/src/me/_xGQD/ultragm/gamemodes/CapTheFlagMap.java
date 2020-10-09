@@ -13,6 +13,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -36,7 +37,8 @@ public class CapTheFlagMap extends Map {
     public CapTheFlagMap(Main plugin, String name) {
         super(plugin, name);
         super.type = "CTF";
-        spawnProt = 40;
+        spawnProt = 80;
+        respawnTime = 40;
         points = new int[]{0, 0};
         redblue = new Color[]{Color.RED, Color.BLUE};
     }
@@ -90,6 +92,10 @@ public class CapTheFlagMap extends Map {
     }
     @Override
     public void death(Player player, int team){
+    	for(PotionEffect effect: player.getActivePotionEffects()) {
+    		player.removePotionEffect(effect.getType());
+    	}
+        player.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 9999999, 255));
         player.setGameMode(GameMode.SPECTATOR);
         spawnProtPlayers.add(player.getUniqueId());
         Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
@@ -188,13 +194,13 @@ public class CapTheFlagMap extends Map {
         if(block.getType() != Material.STAINED_GLASS && block.getType() != Material.SNOW_BLOCK) {
             block.setType(Material.AIR);
             player.sendMessage("You cannot break this block");
-            new BukkitRunnable() {
+            Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
                 @Override
                 public void run() {
                     block.setType(type);
                     block.setData(data);
                 }
-            }.runTaskLater(plugin, 1);
+            },1);
         }
     }
 
@@ -255,6 +261,20 @@ public class CapTheFlagMap extends Map {
                         lastHit.put(player.getUniqueId(), damager);
                     }
                 }
+            }
+            if(event.getCause().equals(DamageCause.LAVA)) {
+                event.setCancelled(true);
+                if(lastHit.containsKey(player.getUniqueId())){
+                    killPerks(lastHit.get(player.getUniqueId()));
+                }
+                death(player, team);
+                Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+                    @Override
+                    public void run() {
+                        spawn(player, team);
+                    }
+                }, respawnTime);
+            	
             }
             if(event.getDamage() >= player.getHealth()){
                 event.setCancelled(true);
