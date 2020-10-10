@@ -12,7 +12,7 @@ public class CTFShop extends Shop{
     public CTFShop(Main plugin, String mapType) {
         super(plugin, mapType);
         shop = Bukkit.createInventory(null, 9);
-        ItemStack permchain = Utilities.createItem(Material.GOLD_CHESTPLATE, "Chain Armor",
+        ItemStack permchain = Utilities.createItem(Material.GOLD_CHESTPLATE, "Gold Armor",
                 new String[]{"Permanent Gold Chestplate, Leggings, Boots", "Cost 100 Gold"});
         ItemStack permsword = Utilities.createItem(Material.GOLD_SWORD, "Sharp 2 Gold Sword",
                 new String[]{"Permanent Sharpness 2 Golden Sword", "Cost 50 Gold"});
@@ -26,7 +26,7 @@ public class CTFShop extends Shop{
         ItemStack rod = Utilities.createItem(Material.FISHING_ROD, "Fishing Rod",
                 new String[]{"Temporary Fishing Rod for until you die", "Cost 30 Gold"});
         ItemStack snow = Utilities.createItem(Material.SNOW_BLOCK, "Snow Block",
-                new String[]{"Temporary Snow Blocks for longer break time", "Cost 20 Gold (4 per)"});
+                new String[]{"Temporary Snow Blocks for longer break time", "Cost 20 Gold (4 per)"});;
         shop.setItem(0, permchain);
         shop.setItem(1, permsword);
         shop.setItem(2, sword);

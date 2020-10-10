@@ -128,7 +128,7 @@ public class CapTheFlagMap extends Map {
                 ItemStack sword = new ItemStack(Material.GOLD_SWORD);
                 sword.addEnchantment(Enchantment.DAMAGE_ALL, 2);
                 sword.addEnchantment(Enchantment.DURABILITY, 3);
-                player.getInventory().addItem(sword);
+                player.getInventory().setItem(0, sword);
             }
             if(buff.equals("permhaste")){
                 player.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 9999999, 2));
