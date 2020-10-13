@@ -5,9 +5,11 @@ import me._xGQD.ultragm.Utilities.Utilities;
 import me._xGQD.ultragm.commands.UGCommand;
 import me._xGQD.ultragm.gamemodes.CapTheFlagMap;
 import me._xGQD.ultragm.gamemodes.Map;
+import me._xGQD.ultragm.gamemodes.UltCapTheFlag;
 import me._xGQD.ultragm.listeners.*;
 import me._xGQD.ultragm.shops.CTFShop;
 import me._xGQD.ultragm.shops.Shop;
+import me._xGQD.ultragm.shops.UCTFShop;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -36,8 +38,10 @@ public class Main extends JavaPlugin {
         load();
         wand = new Utilities.Wand(this, "UG Wand", Material.DIAMOND_SPADE);
         shops = new ArrayList<>();
-        Shop shop = new CTFShop(this, "CTF");
-        shops.add(shop);
+        Shop ctfshop = new CTFShop(this, "CTF");
+        Shop uctfshop = new UCTFShop(this, "UCTF");
+        shops.add(ctfshop);
+        shops.add(uctfshop);
         new BlockBreakListener(this);
         new BlockPlaceListener(this);
         new HitListener(this);
@@ -59,9 +63,7 @@ public class Main extends JavaPlugin {
     private void updateBoard(FastBoard board) {
         int map_i = getMap(board.getPlayer());
         if(map_i != -1){
-            if(maps.get(map_i).getType() == "CTF"){
-                maps.get(map_i).boardChange(board.getPlayer(), board);
-            }
+            maps.get(map_i).boardChange(board.getPlayer(), board);
         }
         board.updateLine(1, ChatColor.RED + "Online: " + ChatColor.GRAY + getServer().getOnlinePlayers().size());
     }
@@ -87,6 +89,13 @@ public class Main extends JavaPlugin {
                     if(config.getString("Type").equals("CTF")){
                         getServer().getConsoleSender().sendMessage("Loading Map...");
                         CapTheFlagMap ctfmap = new CapTheFlagMap(this, file.getName().replaceAll(".yml", ""));
+                        ctfmap.load(config);
+                        ctfmap.close();
+                        maps.add(ctfmap);
+                    }
+                    if(config.getString("Type").equals("UCTF")){
+                        getServer().getConsoleSender().sendMessage("Loading Map...");
+                        UltCapTheFlag ctfmap = new UltCapTheFlag(this, file.getName().replaceAll(".yml", ""));
                         ctfmap.load(config);
                         ctfmap.close();
                         maps.add(ctfmap);

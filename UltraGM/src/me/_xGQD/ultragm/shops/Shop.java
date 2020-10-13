@@ -21,12 +21,10 @@ public class Shop {
     public Shop(Main plugin, String mapType){
         this.plugin = plugin;
         this.mapType = mapType;
-    }
-    public boolean useShop(Map map){
-        return map.getType().equals(mapType);
+        shop = Bukkit.createInventory(null, 9);
     }
     public boolean isShopName(String name){
-        return(shop.getName() == name);
+        return(shop.getName().equals(name));
     }
     public void onInventoryClick(InventoryClickEvent event){
         Player player = (Player) event.getWhoClicked();
@@ -40,12 +38,15 @@ public class Shop {
             }
         }
     }
+    public void open(Player player){
+        player.openInventory(shop);
+    }
     public void onPlayerInteract(PlayerInteractEvent event){
         Player player = event.getPlayer();
         int map_i = plugin.getMap(player);
         if(map_i != -1){
             if(player.getItemInHand().getType().equals(Material.NETHER_STAR)){
-                player.openInventory(shop);
+                open(player);
             }
         }
     }

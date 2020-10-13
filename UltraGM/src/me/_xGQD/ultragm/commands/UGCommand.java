@@ -6,6 +6,8 @@ import me._xGQD.ultragm.Utilities.Pair;
 import me._xGQD.ultragm.Utilities.Utilities;
 import me._xGQD.ultragm.gamemodes.CapTheFlagMap;
 import me._xGQD.ultragm.gamemodes.Map;
+import me._xGQD.ultragm.gamemodes.UltCapTheFlag;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -64,7 +66,7 @@ public class UGCommand implements CommandExecutor {
                     commandSender.sendMessage(ChatColor.BLUE + "/ug map save [map_name] - Select two points with the wand then");
                     commandSender.sendMessage(ChatColor.BLUE + "run this command to save a map");
                     commandSender.sendMessage(ChatColor.BLUE + "/ug map setspawn [map_name] [team_num] - This sets the spawns in a map");
-                    commandSender.sendMessage(ChatColor.BLUE + "/ug map create [map_name] - This creates a map");
+                    commandSender.sendMessage(ChatColor.BLUE + "/ug map create [map_name] [map_type] - This creates a map");
                     commandSender.sendMessage(ChatColor.BLUE + "/ug map close [map_name] - This closes a map for joining");
                     commandSender.sendMessage(ChatColor.BLUE + "/ug map start [map_name] - This starts the game in a map");
                     commandSender.sendMessage(ChatColor.BLUE + "/ug map end [map_name] - This ends a game in a map");
@@ -188,7 +190,11 @@ public class UGCommand implements CommandExecutor {
                             CapTheFlagMap newMap = new CapTheFlagMap(plugin, args[argTaken]);
                             plugin.maps.add(newMap);
                             player.sendMessage("You have created a map called" + args[argTaken]);
-                        }else{
+                        }else if(args[argTaken + 1].equals("UCTF")) {
+                            UltCapTheFlag newMap = new UltCapTheFlag(plugin, args[argTaken]);
+                            plugin.maps.add(newMap);
+                            player.sendMessage("You have created a map called" + args[argTaken]);
+                    	}else{
                             player.sendMessage("Not a valid type name");
                         }
                     }else{
@@ -217,7 +223,7 @@ public class UGCommand implements CommandExecutor {
                 break;
             case "CA5":
                 if(length == 1){
-                    if(player.hasPermission("ug.admin")){
+                    if(commandSender.hasPermission("ug.admin")){
                         boolean success = false;
                         for(int i = 0; i < plugin.maps.size(); i++){
                             if(plugin.maps.get(i).getName().equals(args[argTaken])){
@@ -232,7 +238,7 @@ public class UGCommand implements CommandExecutor {
                             commandSender.sendMessage("Couldn't find the map you where looking for");
                         }
                     }else{
-                        player.sendMessage("You do not have permission to do that");
+                        commandSender.sendMessage("You do not have permission to do that");
                     }
                 }else{
                     commandSender.sendMessage("Not the correct amount of arguments");
@@ -263,7 +269,7 @@ public class UGCommand implements CommandExecutor {
                 break;
             case "CA7":
                 if(length == 1){
-                    if(player.hasPermission("ug.admin")){
+                    if(commandSender.hasPermission("ug.admin")){
                         boolean success = false;
                         for(int i = 0; i < plugin.maps.size(); i++){
                             if(plugin.maps.get(i).getName().equals(args[argTaken])){
@@ -286,7 +292,7 @@ public class UGCommand implements CommandExecutor {
                 break;
             case "CA8":
                 if(length == 1){
-                    if(player.hasPermission("ug.admin")){
+                    if(commandSender.hasPermission("ug.admin")){
                         boolean success = false;
                         for(int i = 0; i < plugin.maps.size(); i++){
                             if(plugin.maps.get(i).getName().equals(args[argTaken])){
@@ -309,7 +315,7 @@ public class UGCommand implements CommandExecutor {
                 break;
             case "CA9":
                 if(length == 2){
-                    if(player.hasPermission("ug.admin")){
+                    if(commandSender.hasPermission("ug.admin")){
                         boolean success = false;
                         for(int i = 0; i < plugin.maps.size(); i++){
                             if(plugin.maps.get(i).getName().equals(args[argTaken])){

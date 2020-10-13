@@ -53,7 +53,7 @@ public class Map {
         return teams.containsKey(player.getUniqueId());
     }
     public void join(Player player){
-        if(open){
+        if(open && !teams.containsKey(player.getUniqueId())){
             plugin.getServer().getConsoleSender().sendMessage(String.valueOf(team_1_count > team_2_count));
             if(team_1_count <= team_2_count){
                 teams.put(player.getUniqueId(), 0);

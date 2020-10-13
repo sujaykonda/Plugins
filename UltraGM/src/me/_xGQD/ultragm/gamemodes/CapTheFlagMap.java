@@ -42,7 +42,40 @@ public class CapTheFlagMap extends Map {
         points = new int[]{0, 0};
         redblue = new Color[]{Color.RED, Color.BLUE};
     }
+    @Override
+    public void open(){
+        super.open();
+        World world = spawn[0].getWorld();
+        plugin.getServer().getWorld(world.getName()).getBlockAt(spawn[0].getBlockX()+1, spawn[0].getBlockY()+1, spawn[0].getBlockZ()).setType(Material.BARRIER);
+        plugin.getServer().getWorld(world.getName()).getBlockAt(spawn[0].getBlockX()-1, spawn[0].getBlockY()+1, spawn[0].getBlockZ()).setType(Material.BARRIER);
+        plugin.getServer().getWorld(world.getName()).getBlockAt(spawn[0].getBlockX(), spawn[0].getBlockY()+1, spawn[0].getBlockZ()+1).setType(Material.BARRIER);
+        plugin.getServer().getWorld(world.getName()).getBlockAt(spawn[0].getBlockX(), spawn[0].getBlockY()+1, spawn[0].getBlockZ()-1).setType(Material.BARRIER);
+        plugin.getServer().getWorld(world.getName()).getBlockAt(spawn[0].getBlockX(), spawn[0].getBlockY()+3, spawn[1].getBlockZ()).setType(Material.BARRIER);
 
+        World world2 = spawn[1].getWorld();
+        plugin.getServer().getWorld(world2.getName()).getBlockAt(spawn[1].getBlockX()+1, spawn[1].getBlockY()+1, spawn[1].getBlockZ()).setType(Material.BARRIER);
+        plugin.getServer().getWorld(world2.getName()).getBlockAt(spawn[1].getBlockX()-1, spawn[1].getBlockY()+1, spawn[1].getBlockZ()).setType(Material.BARRIER);
+        plugin.getServer().getWorld(world2.getName()).getBlockAt(spawn[1].getBlockX(), spawn[1].getBlockY()+1, spawn[1].getBlockZ()+1).setType(Material.BARRIER);
+        plugin.getServer().getWorld(world2.getName()).getBlockAt(spawn[1].getBlockX(), spawn[1].getBlockY()+1, spawn[1].getBlockZ()-1).setType(Material.BARRIER);
+        plugin.getServer().getWorld(world2.getName()).getBlockAt(spawn[1].getBlockX(), spawn[1].getBlockY()+3, spawn[1].getBlockZ()).setType(Material.BARRIER);
+    }
+    @Override
+    public void start(){
+        super.start();
+        World world = spawn[0].getWorld();
+        plugin.getServer().getWorld(world.getName()).getBlockAt(spawn[0].getBlockX()+1, spawn[0].getBlockY()+1, spawn[0].getBlockZ()).setType(Material.AIR);
+        plugin.getServer().getWorld(world.getName()).getBlockAt(spawn[0].getBlockX()-1, spawn[0].getBlockY()+1, spawn[0].getBlockZ()).setType(Material.AIR);
+        plugin.getServer().getWorld(world.getName()).getBlockAt(spawn[0].getBlockX(), spawn[0].getBlockY()+1, spawn[0].getBlockZ()+1).setType(Material.AIR);
+        plugin.getServer().getWorld(world.getName()).getBlockAt(spawn[0].getBlockX(), spawn[0].getBlockY()+1, spawn[0].getBlockZ()-1).setType(Material.AIR);
+        plugin.getServer().getWorld(world.getName()).getBlockAt(spawn[0].getBlockX(), spawn[0].getBlockY()+3, spawn[1].getBlockZ()).setType(Material.AIR);
+
+        World world2 = spawn[1].getWorld();
+        plugin.getServer().getWorld(world2.getName()).getBlockAt(spawn[1].getBlockX()+1, spawn[1].getBlockY()+1, spawn[1].getBlockZ()).setType(Material.AIR);
+        plugin.getServer().getWorld(world2.getName()).getBlockAt(spawn[1].getBlockX()-1, spawn[1].getBlockY()+1, spawn[1].getBlockZ()).setType(Material.AIR);
+        plugin.getServer().getWorld(world2.getName()).getBlockAt(spawn[1].getBlockX(), spawn[1].getBlockY()+1, spawn[1].getBlockZ()+1).setType(Material.AIR);
+        plugin.getServer().getWorld(world2.getName()).getBlockAt(spawn[1].getBlockX(), spawn[1].getBlockY()+1, spawn[1].getBlockZ()-1).setType(Material.AIR);
+        plugin.getServer().getWorld(world2.getName()).getBlockAt(spawn[1].getBlockX(), spawn[1].getBlockY()+3, spawn[1].getBlockZ()).setType(Material.AIR);
+    }
     @Override
     public void spawn(Player player, int team){
         player.setGameMode(GameMode.SURVIVAL);
@@ -138,48 +171,62 @@ public class CapTheFlagMap extends Map {
     @Override
     public boolean buy(Player player, ItemStack item){
         boolean close = false;
-        if(Material.GOLD_CHESTPLATE.equals(item.getType()) && gold.get(player.getUniqueId()) >= 100){
+        if(Material.GOLD_CHESTPLATE.equals(item.getType())){
             close = true;
-            List<String> playerbuffs = buffs.get(player.getUniqueId());
-            playerbuffs.add("permarmor");
-            buffs.put(player.getUniqueId(), playerbuffs);
-            gold.put(player.getUniqueId(), gold.get(player.getUniqueId()) - 100);
+            if(gold.get(player.getUniqueId()) >= 100) {
+            	List<String> playerbuffs = buffs.get(player.getUniqueId());
+            	playerbuffs.add("permarmor");
+            	buffs.put(player.getUniqueId(), playerbuffs);
+            	gold.put(player.getUniqueId(), gold.get(player.getUniqueId()) - 100);
+            }
         }
-        if(Material.GOLD_SWORD.equals(item.getType()) && gold.get(player.getUniqueId()) >= 50){
-            close = true;
-            List<String> playerbuffs = buffs.get(player.getUniqueId());
-            playerbuffs.add("permsword");
-            buffs.put(player.getUniqueId(), playerbuffs);
-            gold.put(player.getUniqueId(), gold.get(player.getUniqueId()) - 50);
+        if(Material.GOLD_SWORD.equals(item.getType())){
+    		close = true;
+        	if(gold.get(player.getUniqueId()) >= 50) {
+            	List<String> playerbuffs = buffs.get(player.getUniqueId());
+            	playerbuffs.add("permsword");
+            	buffs.put(player.getUniqueId(), playerbuffs);
+            	gold.put(player.getUniqueId(), gold.get(player.getUniqueId()) - 50);
+            }
         }
-        if(Material.IRON_CHESTPLATE.equals(item.getType()) && gold.get(player.getUniqueId()) >= 50){
+        if(Material.IRON_CHESTPLATE.equals(item.getType())){
             close = true;
-            player.getInventory().setChestplate(new ItemStack(Material.IRON_CHESTPLATE));
-            player.getInventory().setLeggings(new ItemStack(Material.IRON_LEGGINGS));
-            player.getInventory().setBoots(new ItemStack(Material.IRON_BOOTS));
-            gold.put(player.getUniqueId(), gold.get(player.getUniqueId()) - 50);
+        	if(gold.get(player.getUniqueId()) >= 50) {
+	            player.getInventory().setChestplate(new ItemStack(Material.IRON_CHESTPLATE));
+	            player.getInventory().setLeggings(new ItemStack(Material.IRON_LEGGINGS));
+	            player.getInventory().setBoots(new ItemStack(Material.IRON_BOOTS));
+	            gold.put(player.getUniqueId(), gold.get(player.getUniqueId()) - 50);
+            }
         }
-        if(Material.DIAMOND_SWORD.equals(item.getType()) && gold.get(player.getUniqueId()) >= 25){
+        if(Material.DIAMOND_SWORD.equals(item.getType())){
             close = true;
-            player.getInventory().addItem(new ItemStack(Material.DIAMOND_SWORD));
-            gold.put(player.getUniqueId(), gold.get(player.getUniqueId()) - 25);
+        	if(gold.get(player.getUniqueId()) >= 25) {
+	            player.getInventory().addItem(new ItemStack(Material.DIAMOND_SWORD));
+	            gold.put(player.getUniqueId(), gold.get(player.getUniqueId()) - 25);
+            }
         }
-        if(Material.GOLD_PICKAXE.equals(item.getType()) && gold.get(player.getUniqueId()) >= 50){
+        if(Material.GOLD_PICKAXE.equals(item.getType())){
             close = true;
-            List<String> playerbuffs = buffs.get(player.getUniqueId());
-            playerbuffs.add("permhaste");
-            buffs.put(player.getUniqueId(), playerbuffs);
-            gold.put(player.getUniqueId(), gold.get(player.getUniqueId()) - 50);
+        	if(gold.get(player.getUniqueId()) >= 50) {
+	            List<String> playerbuffs = buffs.get(player.getUniqueId());
+	            playerbuffs.add("permhaste");
+	            buffs.put(player.getUniqueId(), playerbuffs);
+	            gold.put(player.getUniqueId(), gold.get(player.getUniqueId()) - 50);
+            }
         }
-        if(Material.FISHING_ROD.equals(item.getType()) && gold.get(player.getUniqueId()) >= 30){
+        if(Material.FISHING_ROD.equals(item.getType())){
             close = true;
-            player.getInventory().addItem(new ItemStack(Material.FISHING_ROD));
-            gold.put(player.getUniqueId(), gold.get(player.getUniqueId()) - 30);
+        	if(gold.get(player.getUniqueId()) >= 30) {
+	            player.getInventory().addItem(new ItemStack(Material.FISHING_ROD));
+	            gold.put(player.getUniqueId(), gold.get(player.getUniqueId()) - 30);
+            }
         }
-        if(Material.SNOW_BLOCK.equals(item.getType()) && gold.get(player.getUniqueId()) >= 20){
+        if(Material.SNOW_BLOCK.equals(item.getType())){
             close = true;
-            player.getInventory().addItem(new ItemStack(Material.SNOW_BLOCK, 4));
-            gold.put(player.getUniqueId(), gold.get(player.getUniqueId()) - 20);
+        	if(gold.get(player.getUniqueId()) >= 20) {
+	            player.getInventory().addItem(new ItemStack(Material.SNOW_BLOCK, 4));
+	            gold.put(player.getUniqueId(), gold.get(player.getUniqueId()) - 20);
+            }
         }
         readBuffs(player);
         return close;

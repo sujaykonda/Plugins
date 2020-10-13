@@ -11,7 +11,6 @@ public class CTFShop extends Shop{
 
     public CTFShop(Main plugin, String mapType) {
         super(plugin, mapType);
-        shop = Bukkit.createInventory(null, 9);
         ItemStack permchain = Utilities.createItem(Material.GOLD_CHESTPLATE, "Gold Armor",
                 new String[]{"Permanent Gold Chestplate, Leggings, Boots", "Cost 100 Gold"});
         ItemStack permsword = Utilities.createItem(Material.GOLD_SWORD, "Sharp 2 Gold Sword",

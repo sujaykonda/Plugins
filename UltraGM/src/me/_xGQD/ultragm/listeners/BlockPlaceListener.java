@@ -21,7 +21,12 @@ public class BlockPlaceListener implements Listener {
         int map_i = plugin.getMap(player);
         if(map_i != -1){
             Map map = plugin.maps.get(map_i);
-            map.onBlockPlace(event);
+            if(map.isOpen()){
+                event.setCancelled(true);
+            }
+            if(map.isStart()){
+                map.onBlockPlace(event);
+            }
             plugin.maps.set(map_i, map);
         }
     }

@@ -22,7 +22,12 @@ public class HitListener implements Listener {
             int map_i = plugin.getMap(player);
             if(map_i != -1){
                 Map map = plugin.maps.get(map_i);
-                map.onHit(event);
+                if(map.isOpen()){
+                    event.setCancelled(true);
+                }
+                if(map.isStart()){
+                    map.onHit(event);
+                }
                 plugin.maps.set(map_i, map);
             }
         }

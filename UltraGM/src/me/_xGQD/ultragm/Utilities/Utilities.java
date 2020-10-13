@@ -1,7 +1,10 @@
 package me._xGQD.ultragm.Utilities;
 
 
-import me._xGQD.ultragm.Main;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -13,8 +16,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.List;
-import java.util.Set;
+import me._xGQD.ultragm.Main;
 
 public class Utilities {
     public static class CommandStruct{
@@ -36,16 +38,15 @@ public class Utilities {
     public static ItemStack createItem(Material mat, String displayName, String[] newLore){
         ItemStack item = new ItemStack(mat);
         ItemMeta meta;
-        if(item.hasItemMeta()) {
-		    meta = item.getItemMeta();
-		    meta.setDisplayName(displayName);
-		    List<String> lore = meta.getLore();
-		    for(String loreLine: newLore){
-		        lore.add(loreLine);
-		    }
-		    meta.setLore(lore);
-		    item.setItemMeta(meta);
-        }
+		meta = item.getItemMeta();
+		meta.setDisplayName(displayName);
+		List<String> lore = new ArrayList<String>();
+		for(int i = 0; i < newLore.length; i++){
+		    lore.add(newLore[i]);
+		}
+		meta.setLore(lore);
+		item.setItemMeta(meta);
+       
         return item;
     }
     public static class Wand{
