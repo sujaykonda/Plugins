@@ -1,7 +1,0 @@
-name: CommandNPC
-version: 0.1.0
-author: _xGQD
-main: me._xGQD.commandnpc.Main
-commands:
-  cn:
-    description: This is the base command for CommandNPC
