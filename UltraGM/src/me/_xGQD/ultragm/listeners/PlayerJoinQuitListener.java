@@ -45,5 +45,6 @@ public class PlayerJoinQuitListener implements Listener {
         if (board != null) {
             board.delete();
         }
+
     }
 }

@@ -1,9 +1,11 @@
 package me._xGQD.ultragm.shops;
 
 import me._xGQD.ultragm.Main;
+import me._xGQD.ultragm.Utilities.Utilities;
 import me._xGQD.ultragm.gamemodes.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -28,8 +30,8 @@ public class Shop {
     }
     public void onInventoryClick(InventoryClickEvent event){
         Player player = (Player) event.getWhoClicked();
-        int map_i = plugin.getMap(player);
-        if(map_i != -1){
+        if(plugin.players.containsKey(player.getUniqueId())){
+            int map_i = plugin.players.get(player.getUniqueId());
             Map map = plugin.maps.get(map_i);
             boolean close = map.buy(player, event.getCurrentItem());
             if(close){
@@ -43,8 +45,8 @@ public class Shop {
     }
     public void onPlayerInteract(PlayerInteractEvent event){
         Player player = event.getPlayer();
-        int map_i = plugin.getMap(player);
-        if(map_i != -1){
+        if(plugin.players.containsKey(player.getUniqueId())){
+            int map_i = plugin.players.get(player.getUniqueId());
             if(player.getItemInHand().getType().equals(Material.NETHER_STAR)){
                 open(player);
             }

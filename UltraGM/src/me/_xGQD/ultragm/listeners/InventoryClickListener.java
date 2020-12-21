@@ -18,11 +18,11 @@ public class InventoryClickListener implements Listener {
     }
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event){
-        for(int i = 0; i < plugin.shops.size(); i++){
-            Shop shop = plugin.shops.get(i);
+        for(String key : plugin.shops.keySet()){
+            Shop shop = plugin.shops.get(key);
             if(shop.isShopName(event.getInventory().getName())){
                 shop.onInventoryClick(event);
-                plugin.shops.set(i, shop);
+                plugin.shops.put(key, shop);
             }
         }
     }

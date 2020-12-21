@@ -23,16 +23,16 @@ public class PlayerInteractListener implements Listener {
         if(player.getItemInHand().getType().equals(plugin.wand.getType())){
             plugin.wand.onPlayerInteract(event);
         }
-        int map_i = plugin.getMap(player);
-        if(map_i != -1){
-            Map map = plugin.maps.get(map_i);
+        if(plugin.players.containsKey(player.getUniqueId())){
+            int map_i = plugin.players.get(player.getUniqueId());
+            Map map = plugin.maps.get(plugin.players.get(player.getUniqueId()));
             map.onPlayerInteract(event);
             plugin.maps.set(map_i, map);
         }
-        for(int i = 0; i < plugin.shops.size(); i++){
-            Shop shop = plugin.shops.get(i);
+        for(String key : plugin.shops.keySet()){
+            Shop shop = plugin.shops.get(key);
             shop.onPlayerInteract(event);
-            plugin.shops.set(i, shop);
+            plugin.shops.put(key, shop);
         }
     }
 }

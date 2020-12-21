@@ -6,6 +6,7 @@ import me._xGQD.ultragm.Utilities.Pair;
 import me._xGQD.ultragm.Utilities.Utilities;
 import me._xGQD.ultragm.gamemodes.CapTheFlagMap;
 import me._xGQD.ultragm.gamemodes.Map;
+import me._xGQD.ultragm.gamemodes.TeamDeathMatchMap;
 import me._xGQD.ultragm.gamemodes.UltCapTheFlag;
 
 import org.bukkit.ChatColor;
@@ -159,11 +160,7 @@ public class UGCommand implements CommandExecutor {
                         for(int i = 0; i < plugin.maps.size(); i++){
                             if(plugin.maps.get(i).getName().equals(args[argTaken])){
                                 Map map = plugin.maps.get(i);
-                                if(args[argTaken + 1].equals("1")){
-                                    map.spawn = new org.bukkit.Location[]{player.getLocation(), map.spawn[1]};
-                                }else{
-                                    map.spawn = new org.bukkit.Location[]{map.spawn[0], player.getLocation()};
-                                }
+                                map.setspawn(player, args[argTaken + 1]);
                                 plugin.maps.set(i, map);
                                 success = true;
                                 player.sendMessage("You have set spawn " + args[argTaken + 1]);
@@ -194,7 +191,11 @@ public class UGCommand implements CommandExecutor {
                             UltCapTheFlag newMap = new UltCapTheFlag(plugin, args[argTaken]);
                             plugin.maps.add(newMap);
                             player.sendMessage("You have created a map called" + args[argTaken]);
-                    	}else{
+                    	}else if(args[argTaken + 1].equals("TDM")) {
+                            TeamDeathMatchMap newMap = new TeamDeathMatchMap(plugin, args[argTaken]);
+                            plugin.maps.add(newMap);
+                            player.sendMessage("You have created a map called" + args[argTaken]);
+                        }else{
                             player.sendMessage("Not a valid type name");
                         }
                     }else{

@@ -299,10 +299,10 @@ public class CapTheFlagMap extends Map {
                 EntityDamageByEntityEvent e = (EntityDamageByEntityEvent) event;
                 if(e.getDamager() instanceof Player){
                     Player damager = (Player) e.getDamager();
-                    if(teams.get(damager.getUniqueId()) == teams.get(player.getUniqueId())){
+                    if(teams.get(damager.getUniqueId()).equals(teams.get(player.getUniqueId()))){
                         event.setCancelled(true);
                     }
-                    else if(spawnProtPlayers.contains(player)) {
+                    else if(spawnProtPlayers.contains(player.getUniqueId())) {
                         event.setCancelled(true);
                     }else{
                         lastHit.put(player.getUniqueId(), damager);
@@ -407,7 +407,7 @@ public class CapTheFlagMap extends Map {
                             if(player.hasPotionEffect(PotionEffectType.DAMAGE_RESISTANCE)) {
                                 player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
                             }
-                            player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 9999999, 1));
+                            player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 9999999, 0));
                             player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 9999999, 0));
                             gold.put(player.getUniqueId(), gold.get(player.getUniqueId()) + 10);
 
@@ -449,7 +449,7 @@ public class CapTheFlagMap extends Map {
                             if(player.hasPotionEffect(PotionEffectType.DAMAGE_RESISTANCE)) {
                                 player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
                             }
-                            player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 9999999, 1));
+                            player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 9999999, 0));
                             player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 9999999, 0));
                             gold.put(player.getUniqueId(), gold.get(player.getUniqueId()) + 10);
 
@@ -471,5 +471,7 @@ public class CapTheFlagMap extends Map {
         lastHit.clear();
         buffs.clear();
         gold.clear();
+        points[0] = 0;
+        points[1] = 0;
     }
 }

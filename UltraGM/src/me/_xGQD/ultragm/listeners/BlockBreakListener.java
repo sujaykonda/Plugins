@@ -23,9 +23,8 @@ public class BlockBreakListener implements Listener {
         if(player.getItemInHand().getType().equals(plugin.wand.getType())){
             plugin.wand.onPlayerBlockBreak(event);
         }
-        int map_i = plugin.getMap(player);
-        if(map_i != -1){
-            Map map = plugin.maps.get(map_i);
+        if(plugin.players.containsKey(player.getUniqueId())){
+            Map map = plugin.maps.get(plugin.players.get(player.getUniqueId()));
             if(map.isOpen()){
                 Block block = event.getBlock();
                 Material type = block.getType();

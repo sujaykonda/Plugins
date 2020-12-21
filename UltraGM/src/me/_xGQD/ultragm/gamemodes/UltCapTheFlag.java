@@ -32,7 +32,7 @@ public class UltCapTheFlag extends CapTheFlagMap{
     @Override
     public void join(Player player) {
         super.join(player);
-        plugin.shops.get(1).open(player);
+        plugin.shops.get("UCTF").open(player);
         perks.put(player.getUniqueId(), 0);
     }
     @Override
@@ -112,7 +112,7 @@ public class UltCapTheFlag extends CapTheFlagMap{
                             if(player.hasPotionEffect(PotionEffectType.DAMAGE_RESISTANCE)) {
                                 player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
                             }
-                            player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 9999999, 1));
+                            player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 9999999, 0));
                             player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 9999999, 0));
                             gold.put(player.getUniqueId(), gold.get(player.getUniqueId()) + 10);
 
@@ -154,7 +154,7 @@ public class UltCapTheFlag extends CapTheFlagMap{
                             if(player.hasPotionEffect(PotionEffectType.DAMAGE_RESISTANCE)) {
                                 player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
                             }
-                            player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 9999999, 1));
+                            player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 9999999, 0));
                             player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 9999999, 0));
                             gold.put(player.getUniqueId(), gold.get(player.getUniqueId()) + 10);
 
@@ -195,7 +195,6 @@ public class UltCapTheFlag extends CapTheFlagMap{
         if(Material.GOLD_INGOT.equals(item.getType())){
             close = true;
             perks.put(player.getUniqueId(), 1);
-            gold.put(player.getUniqueId(), 30);
         }
         if(Material.POTION.equals(item.getType())){
             close = true;

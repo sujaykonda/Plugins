@@ -1,0 +1,8 @@
+name: TurtleGM
+version: 0.1.0
+author: _xGQD
+main: me._xGQD.turtlegm.Main
+depend: [Citizens, ScoreboardLib, TitleAPI]
+commands:
+  tg:
+    description: This is the base command for TurtleGM

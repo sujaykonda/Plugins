@@ -47,6 +47,13 @@ public class Map {
         this.name = name;
         this.spawn = new Location[]{null, null};
     }
+    public void setspawn(Player player, String num){
+        if(num.equals("1")){
+            spawn[0] = player.getLocation();
+        }else if(num.equals("2")){
+            spawn[1] = player.getLocation();
+        }
+    }
     public void spawn(Player player, int team){ }
     public void death(Player player, int team){ }
     public boolean in(Player player){
@@ -63,6 +70,7 @@ public class Map {
                 team_2_count+=1;
             }
             spawn(player, teams.get(player.getUniqueId()));
+            plugin.players.put(player.getUniqueId(), plugin.maps.indexOf(this));
         }
         if(autostart == (team_1_count + team_2_count)){
             close();
@@ -81,6 +89,7 @@ public class Map {
         open = false;
     }
     public void start(){
+        open = false;
         start = true;
     }
     public void end(){

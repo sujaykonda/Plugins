@@ -40,8 +40,8 @@ public class UCTFShop extends Shop{
     @Override
     public void onInventoryClick(InventoryClickEvent event){
         Player player = (Player) event.getWhoClicked();
-        int map_i = plugin.getMap(player);
-        if(map_i != -1){
+        if(plugin.players.containsKey(player.getUniqueId())){
+            int map_i = plugin.players.get(player.getUniqueId());
             Map map = plugin.maps.get(map_i);
             if(map.getType().equals("UCTF") && map instanceof UltCapTheFlag){
             	UltCapTheFlag umap = (UltCapTheFlag) map;

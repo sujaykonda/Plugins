@@ -19,9 +19,9 @@ public class HitListener implements Listener {
     public void onHit(EntityDamageEvent event){
         if(event.getEntity() instanceof Player) {
             Player player = (Player) event.getEntity();
-            int map_i = plugin.getMap(player);
-            if(map_i != -1){
-                Map map = plugin.maps.get(map_i);
+            if(plugin.players.containsKey(player.getUniqueId())){
+                int map_i = plugin.players.get(player.getUniqueId());
+                Map map = plugin.maps.get(plugin.players.get(player.getUniqueId()));
                 if(map.isOpen()){
                     event.setCancelled(true);
                 }
