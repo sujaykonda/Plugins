@@ -76,6 +76,7 @@ public class PlayerManager {
             map.onDisable();
         }
     }
+    public boolean isMap(String map){return maps.containsKey(map);}
     public boolean playerIn(Player player){
         return !playerPlace.get(player.getUniqueId()).equals("lobby");
     }

@@ -1,6 +1,7 @@
 package me._xGQD.turtlegm.Commands;
 
 import me._xGQD.turtlegm.Main;
+import me._xGQD.turtlegm.Maps.CTF.CTFMap;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -53,6 +54,20 @@ public class TGCommand implements CommandExecutor {
                     }
                 }
                 break;
+            case "kit-open":
+                if(args.length == 2 && commandSender instanceof Player){
+                    if(args[1].equals("CTF")){
+                        CTFMap.openKitEdit(player);
+                    }
+                }
+                break;
+            case "kit-save":
+                if(args.length == 2 && commandSender instanceof Player){
+                    if(args[1].equals("CTF")){
+                        CTFMap.saveKitEdit(player);
+                    }
+                }
+                break;
             case "open":
                 if(args.length == 1 && commandSender instanceof Player){
                     if(plugin.manager.playerIn(player)){
@@ -60,8 +75,12 @@ public class TGCommand implements CommandExecutor {
                         commandSender.sendMessage("Opened the map");
                     }
                 }else if(args.length == 2){
-                    plugin.manager.open(player, args[1]);
-                    commandSender.sendMessage("Opened the map");
+                    if(plugin.manager.isMap(args[1])){
+                        plugin.manager.open(player, args[1]);
+                        commandSender.sendMessage("Opened the map");
+                    }else{
+                        commandSender.sendMessage("Map could not be found");
+                    }
                 }
                 break;
             case "close":
@@ -71,8 +90,12 @@ public class TGCommand implements CommandExecutor {
                         commandSender.sendMessage("Closed The Map");
                     }
                 }else if(args.length == 2){
-                    plugin.manager.close(player, args[1]);
-                    commandSender.sendMessage("Closed The Map");
+                    if(plugin.manager.isMap(args[1])){
+                        plugin.manager.close(player, args[1]);
+                        commandSender.sendMessage("Closed The Map");
+                    }else{
+                        commandSender.sendMessage("Map could not be found");
+                    }
                 }
                 break;
             case "start":
@@ -83,9 +106,13 @@ public class TGCommand implements CommandExecutor {
                         commandSender.sendMessage("Started The Map");
                     }
                 }else if(args.length == 2){
-                    plugin.manager.close(player, args[1]);
-                    plugin.manager.start(player, args[1]);
-                    commandSender.sendMessage("Started The Map");
+                    if(plugin.manager.isMap(args[1])){
+                        plugin.manager.close(player, args[1]);
+                        plugin.manager.start(player, args[1]);
+                        commandSender.sendMessage("Started The Map");
+                    }else{
+                        commandSender.sendMessage("Map could not be found");
+                    }
                 }
                 break;
             case "end":
@@ -95,8 +122,12 @@ public class TGCommand implements CommandExecutor {
                         commandSender.sendMessage("Ended The Map");
                     }
                 }else if(args.length == 2){
-                    plugin.manager.end(player, args[1]);
-                    commandSender.sendMessage("Ended The Map");
+                    if(plugin.manager.isMap(args[1])){
+                        plugin.manager.end(player, args[1]);
+                        commandSender.sendMessage("Ended The Map");
+                    }else{
+                        commandSender.sendMessage("Map could not be found");
+                    }
                 }
                 break;
             case "changesettings":
@@ -107,14 +138,22 @@ public class TGCommand implements CommandExecutor {
                 break;
             case "join":
                 if(args.length == 2){
-                    plugin.manager.joinMap(player, args[1]);
-                    commandSender.sendMessage("Joined the map");
+                    if(plugin.manager.isMap(args[1])){
+                        plugin.manager.joinMap(player, args[1]);
+                        commandSender.sendMessage("Joined the map");
+                    }else{
+                        commandSender.sendMessage("Map could not be found");
+                    }
                 }
                 break;
             case "save":
                 if(args.length == 2){
-                    plugin.manager.saveMap(player, args[1]);
-                    commandSender.sendMessage("Saved the map");
+                    if(plugin.manager.isMap(args[1])){
+                        plugin.manager.saveMap(player, args[1]);
+                        commandSender.sendMessage("Saved the map");
+                    }else{
+                        commandSender.sendMessage("Map could not be found");
+                    }
                 }
                 break;
             case "create":
@@ -125,8 +164,12 @@ public class TGCommand implements CommandExecutor {
                 break;
             case "delete":
                 if(args.length == 2){
-                    plugin.manager.removeMap(args[1]);
-                    commandSender.sendMessage("Deleted the map");
+                    if(plugin.manager.isMap(args[1])){
+                        plugin.manager.removeMap(args[1]);
+                        commandSender.sendMessage("Deleted the map");
+                    }else{
+                        commandSender.sendMessage("Map could not be found");
+                    }
                 }
                 break;
         }

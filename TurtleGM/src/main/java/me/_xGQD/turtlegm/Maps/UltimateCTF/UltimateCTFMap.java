@@ -2,10 +2,10 @@ package me._xGQD.turtlegm.Maps.UltimateCTF;
 
 import com.connorlinfoot.titleapi.TitleAPI;
 import me._xGQD.turtlegm.Maps.CTF.CTFMap;
-import me._xGQD.turtlegm.Maps.CTF.CTFPlayerData;
 import me._xGQD.turtlegm.scoreboard.common.EntryBuilder;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EnderPearl;
 import org.bukkit.entity.Item;
@@ -19,14 +19,13 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.HashMap;
-import java.util.HashSet;
+import java.io.File;
 import java.util.Set;
-import java.util.UUID;
 
 public class UltimateCTFMap extends CTFMap {
     public UltimateCTFMap(String name, boolean load) {
         super(name, load);
+        map_type = "UCTF";
     }
     @Override
     public void readBuffs(Player player){
@@ -66,6 +65,13 @@ public class UltimateCTFMap extends CTFMap {
     @Override
     public void onJoin(Player player){
         if(opened){
+            File file = new File(plugin.getDataFolder(), "/" + player.getUniqueId().toString() + ".yml");
+            if(file.exists() && YamlConfiguration.loadConfiguration(file).getConfigurationSection(map_type) != null){
+                System.out.println(YamlConfiguration.loadConfiguration(file).getConfigurationSection(map_type).toString());
+                kits.put(player.getUniqueId(), loadKit(player.getUniqueId(), YamlConfiguration.loadConfiguration(file).getConfigurationSection(map_type)));
+            }else{
+                kits.put(player.getUniqueId(), loadKit(player.getUniqueId(), null));
+            }
             if(team_count_1 <= team_count_2){
                 playerData.put(player.getUniqueId(), new UltimateCTFPlayerData(0));
                 spawn(player, 0);
@@ -84,17 +90,28 @@ public class UltimateCTFMap extends CTFMap {
         Action action = event.getAction();
         final Player player = event.getPlayer();
         UltimateCTFPlayerData data = (UltimateCTFPlayerData) playerData.get(player.getUniqueId());
-        if(player.getItemInHand().getType().equals(Material.ENDER_PEARL)){
-            final Location playerLoc = player.getLocation();
-            data.inTimeWarp = true;
-            Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-                @Override
-                public void run() {
-                    player.teleport(playerLoc);
-                    ((UltimateCTFPlayerData) playerData.get(player.getUniqueId())).inTimeWarp = false;
-                    player.getInventory().addItem(new ItemStack(Material.ENDER_PEARL));
-                }
-            }, 200);
+        if(player.getItemInHand().getType().equals(Material.ENDER_PEARL) && (action.equals(Action.RIGHT_CLICK_BLOCK) || action.equals(Action.RIGHT_CLICK_AIR)) ){
+            if(data.ePearlCD){
+                final Location playerLoc = player.getLocation();
+                data.inTimeWarp = true;
+                Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+                    @Override
+                    public void run() {
+                        player.teleport(playerLoc);
+                        ((UltimateCTFPlayerData) playerData.get(player.getUniqueId())).inTimeWarp = false;
+                        player.getInventory().addItem(new ItemStack(Material.ENDER_PEARL));
+                        ((UltimateCTFPlayerData) playerData.get(player.getUniqueId())).ePearlCD = false;
+                        Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+                            @Override
+                            public void run() {
+                                ((UltimateCTFPlayerData) playerData.get(player.getUniqueId())).ePearlCD = true;
+                            }
+                        }, 100);
+                    }
+                }, 100);
+            }else{
+                event.setCancelled(true);
+            }
         }
         if(player.getItemInHand().getType().equals(Material.NETHER_STAR)){
             plugin.shops.get("uctf").open(player);
@@ -217,7 +234,7 @@ public class UltimateCTFMap extends CTFMap {
     @Override
     public EntryBuilder updateBoard(EntryBuilder builder, Player player){
         builder.blank();
-        builder.next(ChatColor.DARK_GREEN + "Gold: " + ChatColor.YELLOW + ((CTFPlayerData) playerData.get(player.getUniqueId())).gold);
+        builder.next(ChatColor.DARK_GREEN + "Gold: " + ChatColor.YELLOW + ((UltimateCTFPlayerData) playerData.get(player.getUniqueId())).gold);
         builder.blank();
         return builder;
     }
@@ -274,10 +291,12 @@ public class UltimateCTFMap extends CTFMap {
                             public void run() {
                                 UltimateCTFPlayerData data = (UltimateCTFPlayerData) playerData.get(player.getUniqueId());
                                 spawn(player, data.team);
+                                ((UltimateCTFPlayerData) playerData.get(player.getUniqueId())).ePearlCD = false;
                                 Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
                                     @Override
                                     public void run() {
                                         ((UltimateCTFPlayerData) playerData.get(player.getUniqueId())).spawnProt = false;
+                                        ((UltimateCTFPlayerData) playerData.get(player.getUniqueId())).ePearlCD = true;
                                     }
                                 }, 40);
                             }

@@ -10,14 +10,14 @@ import java.util.HashMap;
 
 public class Shop {
     protected Main plugin;
-    protected Inventory shop;
     protected HashMap<String, Integer> costs;
+    protected Inventory shop;
     public Shop(){
         plugin = JavaPlugin.getPlugin(Main.class);
     }
 
     public boolean isShop(Inventory inv){
-        return inv.getName().equals(shop.getName());
+        return inv.equals(shop);
     }
     public int onBuy(Player player, String material, int gold){
         if(costs.get(material) <= gold){

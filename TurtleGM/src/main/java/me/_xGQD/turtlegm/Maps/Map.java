@@ -6,6 +6,7 @@ import me._xGQD.turtlegm.scoreboard.common.EntryBuilder;
 import net.citizensnpcs.api.npc.NPC;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -22,12 +23,11 @@ import java.util.HashMap;
 import java.util.UUID;
 import java.util.List;
 
-@SuppressWarnings("deprecation")
 public class Map {
-    protected String map_type;
+    protected static String map_type;
     protected List<NPC> npcs;
     protected HashMap<UUID, PlayerData> playerData;
-    protected Main plugin = JavaPlugin.getPlugin(Main.class);
+    protected static Main plugin = JavaPlugin.getPlugin(Main.class);
     protected String name;
     public Map(String name, boolean load){
         this.name = name;
@@ -46,7 +46,9 @@ public class Map {
     public void onClose(){ }
     public void onStart(){ }
     public void onEnd(){ }
-
+    public static void openKitEdit(Player player){ }
+    public static void saveKitEdit(Player player) { }
+    public static Object loadKit(UUID uuid, ConfigurationSection config){ return null; }
     public PlayerData getPlayerData(Player player){
         return playerData.get(player.getUniqueId());
     }

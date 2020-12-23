@@ -11,6 +11,7 @@ import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
@@ -31,17 +32,12 @@ public class UltimateCTFPerks extends Shop{
         ItemStack warp = ItemUtilities.createItem(Material.ENDER_PEARL, "Time Warp Perk",
                 new String[]{"Gives you a time warp pearl"});
 
-        costs.put("GOLD_INGOT", 0);
-        costs.put("IRON_SWORD", 0);
-        costs.put("POTION", 0);
-        costs.put("ENDER_PEARL", 0);
-
         shop.setItem(0, gold);
         shop.setItem(1, kb);
         shop.setItem(2, rush);
         shop.setItem(3, warp);
 }
-
+    @Override
     public void onInventoryClick(InventoryClickEvent event){
         Player player = (Player) event.getWhoClicked();
         String mat = event.getCurrentItem().getType().name();
@@ -49,17 +45,10 @@ public class UltimateCTFPerks extends Shop{
             String mapName = plugin.manager.getMapName(player);
             Map map = plugin.manager.getMap(mapName);
             PlayerData data = map.getPlayerData(player);
-            if(map instanceof CTFMap){
+            if(map instanceof UltimateCTFMap){
                 UltimateCTFMap ctfMap = (UltimateCTFMap) map;
                 UltimateCTFPlayerData ctfData = (UltimateCTFPlayerData) data;
-                int new_gold = onBuy(player, mat, ctfData.gold);
-                if(new_gold < 0){
-                    player.sendMessage("Not enough gold to buy this item");
-                    event.setCancelled(true);
-                    player.closeInventory();
-                    return;
-                }
-                ctfData.gold = new_gold;
+                System.out.println(mat);
                 switch (mat){
                     case "GOLD_INGOT":
                         ctfData.perk = 1;

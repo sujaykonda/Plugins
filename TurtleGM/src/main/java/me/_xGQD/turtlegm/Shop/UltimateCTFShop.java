@@ -1,7 +1,5 @@
 package me._xGQD.turtlegm.Shop;
 
-import me._xGQD.turtlegm.Maps.CTF.CTFMap;
-import me._xGQD.turtlegm.Maps.CTF.CTFPlayerData;
 import me._xGQD.turtlegm.Maps.Map;
 import me._xGQD.turtlegm.Maps.PlayerData;
 import me._xGQD.turtlegm.Maps.UltimateCTF.UltimateCTFMap;
@@ -11,6 +9,7 @@ import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
@@ -86,7 +85,7 @@ public class UltimateCTFShop extends Shop{
                         ctfMap.readBuffs(player);
                         break;
                     case "DIAMOND_SWORD":
-                        player.getInventory().setItem(0, new ItemStack(Material.DIAMOND_SWORD));
+                        player.getInventory().setItem(ctfMap.kits.get(player.getUniqueId()).sword, new ItemStack(Material.DIAMOND_SWORD));
                         event.setCancelled(true);
                         player.closeInventory();
                         break;

@@ -16,11 +16,13 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import me._xGQD.turtlegm.Maps.Map;
 import me._xGQD.turtlegm.Maps.UltimateCTF.UltimateCTFPlayerData;
+import me._xGQD.turtlegm.Maps.Utilities;
 import me._xGQD.turtlegm.scoreboard.common.EntryBuilder;
 import org.bukkit.*;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
@@ -55,14 +57,90 @@ public class CTFMap extends Map {
     protected int buildLimit;
     protected Location[] spawn;
 
+    public HashMap<UUID, CTFKit> kits;
+
     public CTFMap(String name, boolean load){
         super(name, load);
         map_type = "CTF";
         team_count_1 = 0;
         team_count_2 = 0;
         points = new int[]{0, 0};
+        kits = new HashMap<>();
     }
-    @Override
+
+    public static CTFKit loadKit(UUID uuid, ConfigurationSection config){
+        if(config != null) {
+            return (new CTFKit(config.getInt("sword"), config.getInt("blocks"), config.getInt("steak"), config.getInt("shop")));
+        }else{
+            return (new CTFKit(0, 1, 2, 8));
+        }
+    }
+
+    public static void openKitEdit(Player player){
+        ItemStack sword = new ItemStack(Material.IRON_SWORD);
+        ItemStack glass = new ItemStack(Material.STAINED_GLASS);
+        ItemStack steak = new ItemStack(Material.COOKED_BEEF);
+        ItemStack shop = new ItemStack(Material.NETHER_STAR);
+
+        ItemMeta shopmeta = shop.getItemMeta();
+        shopmeta.setDisplayName("Shop");
+
+        player.getInventory().clear();
+        player.getInventory().setItem(0, sword);
+        player.getInventory().setItem(1, glass);
+        player.getInventory().setItem(2, steak);
+        player.getInventory().setItem(8, shop);
+    }
+
+    public static void saveKitEdit(Player player) {
+        int sword = 0;
+        int blocks = 1;
+        int steak = 2;
+        int shop = 8;
+        for(int i = 0; i < player.getInventory().getSize(); i++){
+            if(player.getInventory().getItem(i) != null){
+                if(player.getInventory().getItem(i).getType().equals(Material.IRON_SWORD)){
+                    sword = i;
+                }
+                if(player.getInventory().getItem(i).getType().equals(Material.STAINED_GLASS)){
+                    blocks = i;
+                }
+                if(player.getInventory().getItem(i).getType().equals(Material.COOKED_BEEF)){
+                    steak = i;
+                }
+                if(player.getInventory().getItem(i).getType().equals(Material.NETHER_STAR)){
+                    shop = i;
+                }
+            }
+        }
+        File file = new File(plugin.getDataFolder(), "/" + player.getUniqueId().toString() + ".yml");
+        if(file.exists()){
+            try{
+                YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
+                config.createSection(map_type);
+                config.set(map_type + ".sword", sword);
+                config.set(map_type + ".blocks", blocks);
+                config.set(map_type + ".steak", steak);
+                config.set(map_type + ".shop", shop);
+                config.save(file);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }else{
+            try{
+                YamlConfiguration config = new YamlConfiguration();
+                config.createSection(map_type);
+                config.set(map_type + ".sword", sword);
+                config.set(map_type + ".blocks", blocks);
+                config.set(map_type + ".steak", steak);
+                config.set(map_type + ".shop", shop);
+                config.save(file);
+            }catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     public void save(Player player){
         try {
             File maps_dir = new File(plugin.getDataFolder(), "/maps");
@@ -186,7 +264,7 @@ public class CTFMap extends Map {
         player.setGameMode(GameMode.SURVIVAL);
         player.setHealth(20.0D);
         player.setFoodLevel(20);
-        player.teleport(spawn[team]);
+        player.teleport(Utilities.lookAt(spawn[team], spawn[(team + 1) % 2]));
         ItemStack helm = new ItemStack(Material.LEATHER_HELMET);
         ItemStack chestplate = new ItemStack(Material.LEATHER_CHESTPLATE);
         ItemStack leggings = new ItemStack(Material.LEATHER_LEGGINGS);
@@ -221,10 +299,10 @@ public class CTFMap extends Map {
         player.getInventory().setChestplate(chestplate);
         player.getInventory().setLeggings(leggings);
         player.getInventory().setBoots(boots);
-        player.getInventory().setItem(0, sword);
-        player.getInventory().setItem(1, glass);
-        player.getInventory().setItem(2, steak);
-        player.getInventory().setItem(8, shop);
+        player.getInventory().setItem(kits.get(player.getUniqueId()).sword, sword);
+        player.getInventory().setItem(kits.get(player.getUniqueId()).blocks, glass);
+        player.getInventory().setItem(kits.get(player.getUniqueId()).steak, steak);
+        player.getInventory().setItem(kits.get(player.getUniqueId()).shop, shop);
 
         readBuffs(player);
     }
@@ -244,7 +322,7 @@ public class CTFMap extends Map {
                     ItemStack sword = new ItemStack(Material.GOLD_SWORD);
                     sword.addEnchantment(Enchantment.DAMAGE_ALL, 2);
                     sword.addEnchantment(Enchantment.DURABILITY, 3);
-                    player.getInventory().setItem(0, sword);
+                    player.getInventory().setItem(kits.get(player.getUniqueId()).sword, sword);
                     break;
                 case "haste":
                     player.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 9999999, 2));
@@ -255,6 +333,13 @@ public class CTFMap extends Map {
     @Override
     public void onJoin(Player player){
         if(opened){
+            File file = new File(plugin.getDataFolder(), "/" + player.getUniqueId().toString() + ".yml");
+            if(file.exists() && YamlConfiguration.loadConfiguration(file).getConfigurationSection(map_type) != null){
+                System.out.println(YamlConfiguration.loadConfiguration(file).getConfigurationSection(map_type).toString());
+                kits.put(player.getUniqueId(), loadKit(player.getUniqueId(), YamlConfiguration.loadConfiguration(file).getConfigurationSection(map_type)));
+            }else{
+                kits.put(player.getUniqueId(), loadKit(player.getUniqueId(), null));
+            }
             if(team_count_1 <= team_count_2){
                 playerData.put(player.getUniqueId(), new CTFPlayerData(0));
                 spawn(player, 0);
@@ -294,12 +379,20 @@ public class CTFMap extends Map {
         world.getBlockAt(spawn[0].getBlockX() - 1, spawn[0].getBlockY() + 1, spawn[0].getBlockZ()).setType(Material.BARRIER);
         world.getBlockAt(spawn[0].getBlockX(), spawn[0].getBlockY() + 1, spawn[0].getBlockZ() + 1).setType(Material.BARRIER);
         world.getBlockAt(spawn[0].getBlockX(), spawn[0].getBlockY() + 1, spawn[0].getBlockZ() - 1).setType(Material.BARRIER);
+        world.getBlockAt(spawn[0].getBlockX() + 1, spawn[0].getBlockY(), spawn[0].getBlockZ()).setType(Material.BARRIER);
+        world.getBlockAt(spawn[0].getBlockX() - 1, spawn[0].getBlockY(), spawn[0].getBlockZ()).setType(Material.BARRIER);
+        world.getBlockAt(spawn[0].getBlockX(), spawn[0].getBlockY(), spawn[0].getBlockZ() + 1).setType(Material.BARRIER);
+        world.getBlockAt(spawn[0].getBlockX(), spawn[0].getBlockY(), spawn[0].getBlockZ() - 1).setType(Material.BARRIER);
 
         world.getBlockAt(spawn[1].getBlockX(), spawn[1].getBlockY() + 2, spawn[1].getBlockZ()).setType(Material.BARRIER);
         world.getBlockAt(spawn[1].getBlockX() + 1, spawn[1].getBlockY() + 1, spawn[1].getBlockZ()).setType(Material.BARRIER);
         world.getBlockAt(spawn[1].getBlockX() - 1, spawn[1].getBlockY() + 1, spawn[1].getBlockZ()).setType(Material.BARRIER);
         world.getBlockAt(spawn[1].getBlockX(), spawn[1].getBlockY() + 1, spawn[1].getBlockZ() + 1).setType(Material.BARRIER);
         world.getBlockAt(spawn[1].getBlockX(), spawn[1].getBlockY() + 1, spawn[1].getBlockZ() - 1).setType(Material.BARRIER);
+        world.getBlockAt(spawn[1].getBlockX() + 1, spawn[1].getBlockY(), spawn[1].getBlockZ()).setType(Material.BARRIER);
+        world.getBlockAt(spawn[1].getBlockX() - 1, spawn[1].getBlockY(), spawn[1].getBlockZ()).setType(Material.BARRIER);
+        world.getBlockAt(spawn[1].getBlockX(), spawn[1].getBlockY(), spawn[1].getBlockZ() + 1).setType(Material.BARRIER);
+        world.getBlockAt(spawn[1].getBlockX(), spawn[1].getBlockY(), spawn[1].getBlockZ() - 1).setType(Material.BARRIER);
     }
     @Override
     public void onClose(){
@@ -314,12 +407,20 @@ public class CTFMap extends Map {
         world.getBlockAt(spawn[0].getBlockX() - 1, spawn[0].getBlockY() + 1, spawn[0].getBlockZ()).setType(Material.AIR);
         world.getBlockAt(spawn[0].getBlockX(), spawn[0].getBlockY() + 1, spawn[0].getBlockZ() + 1).setType(Material.AIR);
         world.getBlockAt(spawn[0].getBlockX(), spawn[0].getBlockY() + 1, spawn[0].getBlockZ() - 1).setType(Material.AIR);
+        world.getBlockAt(spawn[0].getBlockX() + 1, spawn[0].getBlockY(), spawn[0].getBlockZ()).setType(Material.AIR);
+        world.getBlockAt(spawn[0].getBlockX() - 1, spawn[0].getBlockY(), spawn[0].getBlockZ()).setType(Material.AIR);
+        world.getBlockAt(spawn[0].getBlockX(), spawn[0].getBlockY(), spawn[0].getBlockZ() + 1).setType(Material.AIR);
+        world.getBlockAt(spawn[0].getBlockX(), spawn[0].getBlockY(), spawn[0].getBlockZ() - 1).setType(Material.AIR);
 
         world.getBlockAt(spawn[1].getBlockX(), spawn[1].getBlockY() + 2, spawn[1].getBlockZ()).setType(Material.AIR);
         world.getBlockAt(spawn[1].getBlockX() + 1, spawn[1].getBlockY() + 1, spawn[1].getBlockZ()).setType(Material.AIR);
         world.getBlockAt(spawn[1].getBlockX() - 1, spawn[1].getBlockY() + 1, spawn[1].getBlockZ()).setType(Material.AIR);
         world.getBlockAt(spawn[1].getBlockX(), spawn[1].getBlockY() + 1, spawn[1].getBlockZ() + 1).setType(Material.AIR);
         world.getBlockAt(spawn[1].getBlockX(), spawn[1].getBlockY() + 1, spawn[1].getBlockZ() - 1).setType(Material.AIR);
+        world.getBlockAt(spawn[1].getBlockX() + 1, spawn[1].getBlockY(), spawn[1].getBlockZ()).setType(Material.AIR);
+        world.getBlockAt(spawn[1].getBlockX() - 1, spawn[1].getBlockY(), spawn[1].getBlockZ()).setType(Material.AIR);
+        world.getBlockAt(spawn[1].getBlockX(), spawn[1].getBlockY(), spawn[1].getBlockZ() + 1).setType(Material.AIR);
+        world.getBlockAt(spawn[1].getBlockX(), spawn[1].getBlockY(), spawn[1].getBlockZ() - 1).setType(Material.AIR);
     }
     @Override
     public void onEnd(){
@@ -330,6 +431,7 @@ public class CTFMap extends Map {
             plugin.manager.gotoLobby(playerUUID);
         }
         playerData.clear();
+        kits.clear();
         load();
     }
 
@@ -507,12 +609,12 @@ public class CTFMap extends Map {
                         Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
                             @Override
                             public void run() {
-                                UltimateCTFPlayerData data = (UltimateCTFPlayerData) playerData.get(player.getUniqueId());
+                                CTFPlayerData data = (CTFPlayerData) playerData.get(player.getUniqueId());
                                 spawn(player, data.team);
                                 Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
                                     @Override
                                     public void run() {
-                                        ((UltimateCTFPlayerData) playerData.get(player.getUniqueId())).spawnProt = false;
+                                        ((CTFPlayerData) playerData.get(player.getUniqueId())).spawnProt = false;
                                     }
                                 }, 40);
                             }

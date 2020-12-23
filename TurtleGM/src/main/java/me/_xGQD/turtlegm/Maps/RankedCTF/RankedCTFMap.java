@@ -49,7 +49,7 @@ public class RankedCTFMap extends CTFMap {
 
     public RankedCTFMap(String map_name, boolean load) {
         super(map_name, load);
-
+        map_type = "RCTF";
     }
 
     @Override
