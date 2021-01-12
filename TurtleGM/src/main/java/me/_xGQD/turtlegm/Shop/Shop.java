@@ -20,9 +20,11 @@ public class Shop {
         return inv.equals(shop);
     }
     public int onBuy(Player player, String material, int gold){
-        if(costs.get(material) <= gold){
-            gold -= costs.get(material);
-            return gold;
+        if(costs.containsKey(material)){
+            if(costs.get(material) <= gold){
+                gold -= costs.get(material);
+                return gold;
+            }
         }
         return -1;
     }

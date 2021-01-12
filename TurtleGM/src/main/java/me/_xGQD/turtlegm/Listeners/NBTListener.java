@@ -1,0 +1,187 @@
+package me._xGQD.turtlegm.Listeners;
+
+import de.tr7zw.nbtapi.NBTCompound;
+import de.tr7zw.nbtapi.NBTEntity;
+import de.tr7zw.nbtapi.NBTItem;
+import me._xGQD.turtlegm.Main;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.entity.*;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.util.Vector;
+
+public class NBTListener implements Listener {
+    Main plugin = JavaPlugin.getPlugin(Main.class);
+    public NBTListener(){
+        Bukkit.getPluginManager().registerEvents(this, plugin);
+    }
+
+    @EventHandler
+    public void onEntityDamage(final EntityDamageByEntityEvent event){
+        if(event.getDamager() instanceof Player){
+            final Player player = (Player) event.getDamager();
+            if(!player.getItemInHand().getType().equals(Material.AIR)){
+                NBTItem nbt = new NBTItem(player.getItemInHand());
+                if(nbt.hasKey("onHit")){
+                    NBTCompound eventCompound = nbt.getCompound("onHit");
+                    for(String modifier : eventCompound.getKeys()){
+                        NBTCompound compound = eventCompound.getCompound(modifier);
+                        switch (modifier){
+                            case "explode":
+                                int delay = 0;
+                                if(compound.hasKey("delay")){
+                                    delay = Integer.parseInt(compound.getString("delay"));
+                                }
+                                Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        TNTPrimed tnt = (TNTPrimed) event.getEntity().getWorld().spawnEntity(event.getEntity().getLocation(), EntityType.PRIMED_TNT);
+                                        tnt.setFuseTicks(0);
+                                    }
+                                }, delay);
+                                break;
+                            case "damage":
+                                double damage = 0;
+                                delay = 0;
+                                if(compound.hasKey("damage")){
+                                    damage = Double.parseDouble(compound.getString("damage"));
+                                }
+                                if(compound.hasKey("delay")){
+                                    delay = Integer.parseInt(compound.getString("delay"));
+                                }
+                                final double dm = damage;
+                                Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if(event.getEntity() instanceof Damageable){
+                                            Damageable entity = (Damageable) event.getEntity();
+                                            if(player.getHealth() < dm){
+                                                entity.setHealth(0);
+                                            } else {
+                                                entity.setHealth(player.getHealth() - dm);
+                                            }
+                                        }
+                                    }
+                                }, delay);
+                                break;
+                            case "knockback":
+                                double kb = 0;
+                                delay = 0;
+                                if(compound.hasKey("delay")){
+                                    delay = Integer.parseInt(compound.getString("delay"));
+                                }
+                                if(compound.hasKey("knockback")){
+                                    kb = Double.parseDouble(compound.getString("knockback"));
+                                }
+                                final double kb_adder = kb;
+                                Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        event.getEntity().setVelocity(player.getLocation().getDirection().setY(0).normalize().multiply(kb_adder));
+
+                                    }
+                                }, delay);
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onPlayerInteract(final PlayerInteractEvent event){
+        Action action = event.getAction();
+        final Player player = event.getPlayer();
+        if(!player.getItemInHand().getType().equals(Material.AIR)){
+            NBTItem nbt = new NBTItem(player.getItemInHand());
+            if((action.equals(Action.RIGHT_CLICK_BLOCK) || action.equals(Action.LEFT_CLICK_BLOCK)) && nbt.hasKey("onClickBlock")){
+                NBTCompound eventCompound = nbt.getCompound("onClickBlock");
+                for(String modifier : eventCompound.getKeys()){
+                    NBTCompound compound = eventCompound.getCompound(modifier);
+                    switch (modifier){
+                        case "explode":
+                            int delay = 0;
+                            if(compound.hasKey("delay")){
+                                delay = Integer.parseInt(compound.getString("delay"));
+                            }
+                            Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+                                @Override
+                                public void run() {
+                                    TNTPrimed tnt = (TNTPrimed) player.getWorld().spawnEntity(event.getClickedBlock().getLocation(), EntityType.PRIMED_TNT);
+                                    tnt.setFuseTicks(0);
+                                }
+                            }, delay);
+                            break;
+                        case "delete":
+                            event.getClickedBlock().setType(Material.AIR);
+                            break;
+                    }
+                }
+            }
+            if((action.equals(Action.RIGHT_CLICK_BLOCK) || action.equals(Action.RIGHT_CLICK_AIR)) && nbt.hasKey("onRightClick")){
+                NBTCompound eventCompound = nbt.getCompound("onRightClick");
+                for(String modifier : eventCompound.getKeys()){
+                    NBTCompound compound = eventCompound.getCompound(modifier);
+                    switch (modifier){
+                        case "explode":
+                            int delay = 0;
+                            if(compound.hasKey("delay")){
+                                delay = Integer.parseInt(compound.getString("delay"));
+                            }
+                            Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+                                @Override
+                                public void run() {
+                                    TNTPrimed tnt = (TNTPrimed) player.getWorld().spawnEntity(player.getLocation(), EntityType.PRIMED_TNT);
+                                    tnt.setFuseTicks(0);
+                                }
+                            }, delay);
+                            break;
+                        case "teleport":
+                            double distance = 1;
+                            if(compound.hasKey("distance")){
+                                distance = Double.parseDouble(compound.getString("distance"));
+                            }
+                            player.teleport(player.getLocation().add(player.getLocation().getDirection().normalize().multiply(distance)));
+                            break;
+                        case "arrow":
+                            int speed = 1;
+                            float spread = 1;
+                            if(compound.hasKey("speed")){
+                                speed = Integer.parseInt(compound.getString("speed"));
+                            }
+                            if(compound.hasKey("spread")){
+                                spread = Float.parseFloat(compound.getString("spread"));
+                            }
+                            Arrow arrow = player.getWorld().spawnArrow(player.getLocation().add(0, 1, 0).add(player.getLocation().getDirection().normalize()), player.getLocation().getDirection().normalize(), speed, spread);
+                        case "knockback":
+                            double kb = 0;
+                            delay = 0;
+                            if(compound.hasKey("delay")){
+                                delay = Integer.parseInt(compound.getString("delay"));
+                            }
+                            if(compound.hasKey("knockback")){
+                                kb = Double.parseDouble(compound.getString("knockback"));
+                            }
+                            final double knockback = kb;
+                            player.setVelocity(player.getLocation().getDirection().normalize().multiply(0));
+                            Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+                                @Override
+                                public void run() {
+                                    player.setVelocity(player.getLocation().getDirection().normalize().multiply(knockback));
+                                }
+                            }, delay);
+                            break;
+                    }
+                }
+            }
+        }
+    }
+}

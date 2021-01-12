@@ -6,3 +6,5 @@ depend: [Citizens, ScoreboardLib, TitleAPI]
 commands:
   tg:
     description: This is the base command for TurtleGM
+  item:
+    description: bad

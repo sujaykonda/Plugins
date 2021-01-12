@@ -25,7 +25,7 @@ public class UltimateCTFPerks extends Shop{
         ItemStack gold = ItemUtilities.createItem(Material.GOLD_INGOT, "Gold Perk",
                 new String[]{"Gives you 15 gold instead of 10 gold on kill"});
         ItemStack kb = ItemUtilities.createItem(Material.IRON_SWORD, "Knockback Perk",
-                new String[]{"Gives you knockback enchantment on your sword"});
+                new String[]{"Gives you the capability to deal more knockback with your sword"});
             kb.addEnchantment(Enchantment.KNOCKBACK, 1);
         ItemStack rush = ItemUtilities.createItem(Material.POTION, "Rush Perk",
                 new String[]{"Gives you speed on kill"});
@@ -42,9 +42,9 @@ public class UltimateCTFPerks extends Shop{
         Player player = (Player) event.getWhoClicked();
         String mat = event.getCurrentItem().getType().name();
         if(plugin.manager.playerIn(player)){
-            String mapName = plugin.manager.getMapName(player);
-            Map map = plugin.manager.getMap(mapName);
-            PlayerData data = map.getPlayerData(player);
+            String[] ids = plugin.manager.getMapIds(player);
+            Map map = plugin.manager.getMap(ids[0], ids[1]);
+            PlayerData data = map.playerData.get(player.getUniqueId());
             if(map instanceof UltimateCTFMap){
                 UltimateCTFMap ctfMap = (UltimateCTFMap) map;
                 UltimateCTFPlayerData ctfData = (UltimateCTFPlayerData) data;
@@ -70,10 +70,14 @@ public class UltimateCTFPerks extends Shop{
                         event.setCancelled(true);
                         player.closeInventory();
                         break;
+                    default:
+                        event.setCancelled(true);
+                        player.closeInventory();
+                        break;
                 }
                 ctfMap.readBuffs(player);
-                ctfMap.setPlayerData(player, ctfData);
-                plugin.manager.setMap(mapName, ctfMap);
+                ctfMap.playerData.put(player.getUniqueId(), ctfData);
+                plugin.manager.setMap(ids[0], ids[1], ctfMap);
             }
         }
     }

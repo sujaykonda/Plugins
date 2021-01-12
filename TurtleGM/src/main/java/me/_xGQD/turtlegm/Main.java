@@ -2,12 +2,15 @@ package me._xGQD.turtlegm;
 
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
+import me._xGQD.turtlegm.Commands.IllegalItemCommand;
 import me._xGQD.turtlegm.Commands.TGCommand;
 import me._xGQD.turtlegm.Listeners.MapListener;
-import me._xGQD.turtlegm.Shop.CTFShop;
-import me._xGQD.turtlegm.Shop.Shop;
-import me._xGQD.turtlegm.Shop.UltimateCTFPerks;
-import me._xGQD.turtlegm.Shop.UltimateCTFShop;
+import me._xGQD.turtlegm.Listeners.NBTListener;
+import me._xGQD.turtlegm.Maps.CTF.CTFMap;
+import me._xGQD.turtlegm.Maps.Map;
+import me._xGQD.turtlegm.Maps.RankedCTF.RankedCTFMap;
+import me._xGQD.turtlegm.Maps.UltimateCTF.UltimateCTFMap;
+import me._xGQD.turtlegm.Shop.*;
 import me._xGQD.turtlegm.scoreboard.ScoreboardLib;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
@@ -16,6 +19,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -40,9 +44,13 @@ public class Main extends JavaPlugin {
         shops.put("ctf", new CTFShop());
         shops.put("uctfPerks", new UltimateCTFPerks());
         shops.put("uctf", new UltimateCTFShop());
+        shops.put("team_selector_ctf", new CTFTeamSelector());
+        shops.put("skyuhckits", new SkyUHCKitSelector());
 
         new MapListener();
+        new NBTListener();
 
+        new IllegalItemCommand();
         new TGCommand();
 
 
@@ -50,7 +58,7 @@ public class Main extends JavaPlugin {
         we = wep.getWorldEdit();
         try {
             manager = new PlayerManager();
-        } catch (IOException | InvalidConfigurationException e) {
+        } catch (IOException | InvalidConfigurationException | InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
             e.printStackTrace();
         }
 

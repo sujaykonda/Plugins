@@ -2,13 +2,15 @@ package me._xGQD.turtlegm.Maps.UltimateCTF;
 
 import com.connorlinfoot.titleapi.TitleAPI;
 import me._xGQD.turtlegm.Maps.CTF.CTFMap;
+import me._xGQD.turtlegm.Shop.UltimateCTFPerks;
 import me._xGQD.turtlegm.scoreboard.common.EntryBuilder;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.EnderPearl;
-import org.bukkit.entity.Item;
+import me._xGQD.turtlegm.Maps.UltimateCTF.UltimateCTFPlayerData;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.FishHook;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -21,54 +23,29 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.io.File;
 import java.util.Set;
+import java.util.UUID;
 
 public class UltimateCTFMap extends CTFMap {
     public UltimateCTFMap(String name, boolean load) {
         super(name, load);
-        map_type = "UCTF";
+    }
+    public static String getType(){
+        return "uctf";
     }
     @Override
     public void readBuffs(Player player){
-        UltimateCTFPlayerData data = (UltimateCTFPlayerData) playerData.get(player.getUniqueId());
-        for(String buff : data.buffs){
-            switch (buff){
-                case "permarmor":
-                    ItemStack chest = new ItemStack(Material.GOLD_CHESTPLATE);
-                    ItemStack boots = new ItemStack(Material.GOLD_BOOTS);
-                    chest.addEnchantment(Enchantment.DURABILITY, 3);
-                    boots.addEnchantment(Enchantment.DURABILITY, 3);
-                    player.getInventory().setChestplate(chest);
-                    player.getInventory().setBoots(boots);
-                    break;
-                case "permsword":
-                    ItemStack sword = new ItemStack(Material.GOLD_SWORD);
-                    sword.addEnchantment(Enchantment.DAMAGE_ALL, 2);
-                    sword.addEnchantment(Enchantment.DURABILITY, 3);
-                    player.getInventory().setItem(0, sword);
-                    break;
-                case "haste":
-                    player.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 9999999, 2));
-                    break;
-            }
-        }
-        switch (data.perk){
-            case 2:
-                ItemStack currentSword = player.getInventory().getItem(0);
-                currentSword.addEnchantment(Enchantment.KNOCKBACK, 1);
-                player.getInventory().setItem(0, currentSword);
-                break;
-            case 4:
-                player.getInventory().addItem(new ItemStack(Material.ENDER_PEARL));
-                break;
+        UltimateCTFPlayerData data = getPlayerData(player.getUniqueId());
+        super.readBuffs(player);
+        if (data.perk == 4) {
+            player.getInventory().addItem(new ItemStack(Material.ENDER_PEARL));
         }
     }
     @Override
     public void onJoin(Player player){
         if(opened){
             File file = new File(plugin.getDataFolder(), "/" + player.getUniqueId().toString() + ".yml");
-            if(file.exists() && YamlConfiguration.loadConfiguration(file).getConfigurationSection(map_type) != null){
-                System.out.println(YamlConfiguration.loadConfiguration(file).getConfigurationSection(map_type).toString());
-                kits.put(player.getUniqueId(), loadKit(player.getUniqueId(), YamlConfiguration.loadConfiguration(file).getConfigurationSection(map_type)));
+            if(file.exists() && YamlConfiguration.loadConfiguration(file).getConfigurationSection("ctf") != null){
+                kits.put(player.getUniqueId(), loadKit(player.getUniqueId(), YamlConfiguration.loadConfiguration(file).getConfigurationSection("ctf")));
             }else{
                 kits.put(player.getUniqueId(), loadKit(player.getUniqueId(), null));
             }
@@ -84,27 +61,30 @@ public class UltimateCTFMap extends CTFMap {
             plugin.shops.get("uctfPerks").open(player);
         }
     }
+    @Override
+    public void openShop(Player player){
+        plugin.shops.get("uctf").open(player);
+    }
 
     @Override
     public void onPlayerInteract(PlayerInteractEvent event){
         Action action = event.getAction();
         final Player player = event.getPlayer();
-        UltimateCTFPlayerData data = (UltimateCTFPlayerData) playerData.get(player.getUniqueId());
+        UltimateCTFPlayerData data = getPlayerData(player.getUniqueId());
         if(player.getItemInHand().getType().equals(Material.ENDER_PEARL) && (action.equals(Action.RIGHT_CLICK_BLOCK) || action.equals(Action.RIGHT_CLICK_AIR)) ){
             if(data.ePearlCD){
                 final Location playerLoc = player.getLocation();
                 data.inTimeWarp = true;
+                getPlayerData(player.getUniqueId()).ePearlCD = false;
                 Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
                     @Override
                     public void run() {
                         player.teleport(playerLoc);
-                        ((UltimateCTFPlayerData) playerData.get(player.getUniqueId())).inTimeWarp = false;
-                        player.getInventory().addItem(new ItemStack(Material.ENDER_PEARL));
-                        ((UltimateCTFPlayerData) playerData.get(player.getUniqueId())).ePearlCD = false;
+                        getPlayerData(player.getUniqueId()).inTimeWarp = false;
                         Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
                             @Override
                             public void run() {
-                                ((UltimateCTFPlayerData) playerData.get(player.getUniqueId())).ePearlCD = true;
+                                getPlayerData(player.getUniqueId()).ePearlCD = true;
                             }
                         }, 100);
                     }
@@ -113,174 +93,88 @@ public class UltimateCTFMap extends CTFMap {
                 event.setCancelled(true);
             }
         }
-        if(player.getItemInHand().getType().equals(Material.NETHER_STAR)){
-            plugin.shops.get("uctf").open(player);
-        }
-        if(action.equals(Action.RIGHT_CLICK_BLOCK)){
-            Block block = player.getTargetBlock((Set<Material>) null, 3);
-            if(block != null && block.getType() == Material.STANDING_BANNER && !data.inTimeWarp){
-                if(block.getData() == (byte) 8){
-                    if(data.capturedFlag){
-                        if(data.team == 0){
-                            data.gold += 10;
-                            ItemStack helm = new ItemStack(Material.LEATHER_HELMET);
-
-                            LeatherArmorMeta helmLeatherMeta = (LeatherArmorMeta)helm.getItemMeta();
-                            helmLeatherMeta.setColor(Color.RED);
-                            helm.setItemMeta(helmLeatherMeta);
-
-                            player.getInventory().setHelmet(helm);
-
-                            points[0] += 1;
-                            data.capturedFlag = false;
-
-                            if(points[0] == 2) {
-                                for(Player onlinePlayer : Bukkit.getOnlinePlayers()){
-                                    if(playerData.containsKey(onlinePlayer.getUniqueId())){
-                                        TitleAPI.sendTitle(onlinePlayer, 10, 40, 10, "Team 1 has won the game", null);
-                                    }
-                                }
-                                onEnd();
-                            }else{
-                                for(Player onlinePlayer : Bukkit.getOnlinePlayers()){
-                                    if(playerData.containsKey(onlinePlayer.getUniqueId())){
-                                        onlinePlayer.sendMessage("Team 1 has captured a flag");
-                                    }
-                                }
-                            }
-                        }
-                    }else{
-                        if(data.team == 1) {
-
-                            if(player.hasPotionEffect(PotionEffectType.DAMAGE_RESISTANCE)) {
-                                player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
-                            }
-
-                            player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 9999999, 0));
-                            player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 9999999, 0));
-
-                            data.gold += 10;
-                            data.capturedFlag = true;
-                            for(Player onlinePlayer : Bukkit.getOnlinePlayers()){
-                                if(playerData.containsKey(onlinePlayer.getUniqueId())){
-                                    onlinePlayer.sendMessage("Team 2 has picked up the flag");
-                                }
-                            }
-
-                            ItemStack banner = new ItemStack(Material.BANNER, 1, (byte) 1);
-
-                            player.getInventory().setHelmet(banner);
-                        }
-                    }
-                }else {
-
-                    if(data.capturedFlag) {
-                        if(data.team == 1) {
-                            data.gold += 10;
-
-                            ItemStack helm = new ItemStack(Material.LEATHER_HELMET);
-
-                            LeatherArmorMeta helmLeatherMeta = (LeatherArmorMeta)helm.getItemMeta();
-                            helmLeatherMeta.setColor(Color.BLUE);
-                            helm.setItemMeta(helmLeatherMeta);
-
-                            player.getInventory().setHelmet(helm);
-
-                            points[1] += 1;
-                            data.capturedFlag = false;
-
-                            if(points[1] == 2) {
-                                for(Player onlinePlayer : Bukkit.getOnlinePlayers()){
-                                    if(playerData.containsKey(onlinePlayer.getUniqueId())){
-                                        TitleAPI.sendTitle(onlinePlayer, 10, 40, 10, "Team 2 has won the game", null);
-                                    }
-                                }
-                                onEnd();
-                            }else{
-                                for(Player onlinePlayer : Bukkit.getOnlinePlayers()){
-                                    if(playerData.containsKey(onlinePlayer.getUniqueId())){
-                                        onlinePlayer.sendMessage("Team 2 has captured a flag");
-                                    }
-                                }
-                            }
-                        }
-
-                    }else {
-                        if(data.team == 0) {
-                            if(player.hasPotionEffect(PotionEffectType.DAMAGE_RESISTANCE)) {
-                                player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
-                            }
-
-                            player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 9999999, 0));
-                            player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 9999999, 0));
-
-                            data.gold += 10;
-                            data.capturedFlag = true;
-                            for(Player onlinePlayer : Bukkit.getOnlinePlayers()){
-                                if(playerData.containsKey(onlinePlayer.getUniqueId())){
-                                    onlinePlayer.sendMessage("Team 1 has picked up a flag");
-                                }
-                            }
-
-                            ItemStack banner = new ItemStack(Material.BANNER, 1, (byte) 4);
-
-                            player.getInventory().setHelmet(banner);
-                        }
-                    }
-                }
-            }
-        }
+        super.onPlayerInteract(event);
     }
     @Override
-    public EntryBuilder updateBoard(EntryBuilder builder, Player player){
-        builder.blank();
-        builder.next(ChatColor.DARK_GREEN + "Gold: " + ChatColor.YELLOW + ((UltimateCTFPlayerData) playerData.get(player.getUniqueId())).gold);
-        builder.blank();
-        return builder;
+    public UltimateCTFPlayerData getPlayerData(UUID playerUUID){
+        return (UltimateCTFPlayerData) playerData.get(playerUUID);
     }
     @Override
     public void onEntityDamage(EntityDamageEvent event){
         if(event.getEntity() instanceof Player){
             final Player player = (Player) event.getEntity();
-            UltimateCTFPlayerData data = (UltimateCTFPlayerData) playerData.get(player.getUniqueId());
+            UltimateCTFPlayerData data = getPlayerData(player.getUniqueId());
             if(event instanceof EntityDamageByEntityEvent){
                 EntityDamageByEntityEvent e = (EntityDamageByEntityEvent) event;
+
+                if(e.getDamager() instanceof FishHook && ((FishHook) e.getDamager()).getShooter() instanceof Player){
+                    Player damager = (Player) ((FishHook) e.getDamager()).getShooter();
+                    if(playerData.containsKey(damager.getUniqueId())){
+                        UltimateCTFPlayerData damagerData = getPlayerData(damager.getUniqueId());
+                        if (data.team == damagerData.team){
+                            event.setCancelled(true);
+                        } else if (data.spawnProt){
+                            event.setCancelled(true);
+                        } else {
+                            data.lastHit = damager.getUniqueId();
+                            if(damagerData.spawnProt){
+                                damagerData.spawnProt = false;
+                                playerData.put(damager.getUniqueId(), damagerData);
+                            }
+                            playerData.put(player.getUniqueId(), data);
+                        }
+                    }
+                }
+
                 if(e.getDamager() instanceof Player){
                     Player damager = (Player) e.getDamager();
-                    UltimateCTFPlayerData damagerData = (UltimateCTFPlayerData) playerData.get(damager.getUniqueId());
-                    if (data.team == damagerData.team){
-                        event.setCancelled(true);
-                    } else if (data.spawnProt){
-                        event.setCancelled(true);
-                    } else {
-                        data.lastHit = damager.getUniqueId();
-                        playerData.put(player.getUniqueId(), data);
+
+                    if(playerData.containsKey(damager.getUniqueId())){
+                        UltimateCTFPlayerData damagerData = getPlayerData(damager.getUniqueId());
+                        if (data.team == damagerData.team){
+                            event.setCancelled(true);
+                        } else if (data.spawnProt){
+                            event.setCancelled(true);
+                        } else {
+                            if(damagerData.perk == 2){
+                                player.setVelocity(damager.getLocation().getDirection().setY(0).normalize().multiply(0.35));
+                            }
+                            data.lastHit = damager.getUniqueId();
+                            playerData.put(player.getUniqueId(), data);
+                        }
                     }
                 }
             }
             if(event.getDamage() >= player.getHealth() || event.getCause().equals(EntityDamageEvent.DamageCause.LAVA)){
                 event.setCancelled(true);
+                player.playEffect(EntityEffect.DEATH);
                 if(data.lastHit != null){
                     Player lastHitPlayer = Bukkit.getPlayer(data.lastHit);
+                    lastHitPlayer.playEffect(EntityEffect.FIREWORK_EXPLODE);
                     lastHitPlayer.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 60, 3));
                     lastHitPlayer.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 100, 0));
-                    if(((UltimateCTFPlayerData) playerData.get(data.lastHit)).perk == 3){
+                    if(getPlayerData(data.lastHit).perk == 3){
                         lastHitPlayer.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 1));
                     }
-                    if(((UltimateCTFPlayerData) playerData.get(data.lastHit)).perk == 1){
-                        ((UltimateCTFPlayerData) playerData.get(data.lastHit)).gold += 15;
+                    if(getPlayerData(data.lastHit).perk == 1){
+                        getPlayerData(data.lastHit).gold += 15;
                     }else {
-                        ((UltimateCTFPlayerData) playerData.get(data.lastHit)).gold += 10;
+                        getPlayerData(data.lastHit).gold += 10;
                     }
                 }
                 for(PotionEffect effect : player.getActivePotionEffects()){
                     player.removePotionEffect(effect.getType());
                 }
                 player.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 999999, 255));
-                ((UltimateCTFPlayerData) playerData.get(player.getUniqueId())).capturedFlag = false;
-                ((UltimateCTFPlayerData) playerData.get(player.getUniqueId())).spawnProt = true;
-                ((UltimateCTFPlayerData) playerData.get(player.getUniqueId())).lastHit = null;
+                getPlayerData(player.getUniqueId()).capturedFlag = false;
+                getPlayerData(player.getUniqueId()).spawnProt = true;
+                getPlayerData(player.getUniqueId()).lastHit = null;
                 player.setGameMode(GameMode.SPECTATOR);
+                for(Player onlinePlayer : Bukkit.getOnlinePlayers()){
+                    if(playerData.containsKey(onlinePlayer.getUniqueId())){
+                        onlinePlayer.sendMessage(player.getName() + "has died");
+                    }
+                }
                 TitleAPI.sendTitle(player, 0, 20, 0, "", "You will be respawned in 2 second");
                 Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
                     @Override
@@ -289,14 +183,14 @@ public class UltimateCTFMap extends CTFMap {
                         Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
                             @Override
                             public void run() {
-                                UltimateCTFPlayerData data = (UltimateCTFPlayerData) playerData.get(player.getUniqueId());
+                                UltimateCTFPlayerData data = getPlayerData(player.getUniqueId());
                                 spawn(player, data.team);
-                                ((UltimateCTFPlayerData) playerData.get(player.getUniqueId())).ePearlCD = false;
+                                getPlayerData(player.getUniqueId()).ePearlCD = false;
                                 Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
                                     @Override
                                     public void run() {
-                                        ((UltimateCTFPlayerData) playerData.get(player.getUniqueId())).spawnProt = false;
-                                        ((UltimateCTFPlayerData) playerData.get(player.getUniqueId())).ePearlCD = true;
+                                        getPlayerData(player.getUniqueId()).spawnProt = false;
+                                        getPlayerData(player.getUniqueId()).ePearlCD = true;
                                     }
                                 }, 40);
                             }

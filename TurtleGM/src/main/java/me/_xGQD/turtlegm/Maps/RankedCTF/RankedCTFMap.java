@@ -49,7 +49,14 @@ public class RankedCTFMap extends CTFMap {
 
     public RankedCTFMap(String map_name, boolean load) {
         super(map_name, load);
-        map_type = "RCTF";
+    }
+    public static String getType(){
+        return "rctf";
+    }
+
+    @Override
+    public String getMapType(){
+        return "rctf";
     }
 
     @Override
@@ -91,7 +98,7 @@ public class RankedCTFMap extends CTFMap {
                                         plugin.manager.playerElo.get(playerUUID).addElo("RankedCTF", -10);
                                     }
                                 }
-                                onEnd();
+                                endGame();
                             }else{
                                 for(Player onlinePlayer : Bukkit.getOnlinePlayers()){
                                     if(playerData.containsKey(onlinePlayer.getUniqueId())){
@@ -156,7 +163,7 @@ public class RankedCTFMap extends CTFMap {
                                         }
                                     }
                                 }
-                                onEnd();
+                                endGame();
                             }else{
                                 for(Player onlinePlayer : Bukkit.getOnlinePlayers()){
                                     if(playerData.containsKey(onlinePlayer.getUniqueId())){

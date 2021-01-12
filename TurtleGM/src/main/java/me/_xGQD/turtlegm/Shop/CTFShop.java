@@ -29,10 +29,10 @@ public class CTFShop extends Shop{
                 new String[]{"Temporary Diamond Sword for until you die", "Cost 25 Gold"});
         ItemStack iron = ItemUtilities.createItem(Material.IRON_CHESTPLATE, "Iron Armor",
                 new String[]{"Temporary Iron Armor for until you die", "Cost 50 Gold"});
-        ItemStack haste = ItemUtilities.createItem(Material.GOLD_PICKAXE, "Haste 3",
-                new String[]{"Permanent Haste 3 for faster break time", "Cost 50 Gold"});
+        ItemStack shears = ItemUtilities.createItem(Material.SHEARS, "Shears",
+                new String[]{"Permanent Shears for faster break time", "Cost 50 Gold"});
         ItemStack rod = ItemUtilities.createItem(Material.FISHING_ROD, "Fishing Rod",
-                new String[]{"Temporary Fishing Rod for until you die", "Cost 30 Gold"});
+                new String[]{"Temporary Fishing Rod for until you die", "Cost 50 Gold"});
         ItemStack snow = ItemUtilities.createItem(Material.SNOW_BLOCK, "Snow Block",
                 new String[]{"Temporary Snow Blocks for longer break time", "Cost 20 Gold (4 per)"});
 
@@ -40,15 +40,15 @@ public class CTFShop extends Shop{
         costs.put("GOLD_SWORD", 50);
         costs.put("DIAMOND_SWORD", 25);
         costs.put("IRON_CHESTPLATE", 50);
-        costs.put("GOLD_PICKAXE", 50);
-        costs.put("FISHING_ROD", 30);
+        costs.put("SHEARS", 50);
+        costs.put("FISHING_ROD", 50);
         costs.put("SNOW_BLOCK", 20);
 
         shop.setItem(0, permchain);
         shop.setItem(1, permsword);
         shop.setItem(2, sword);
         shop.setItem(3, iron);
-        shop.setItem(4, haste);
+        shop.setItem(4, shears);
         shop.setItem(5, rod);
         shop.setItem(6, snow);
     }
@@ -57,9 +57,9 @@ public class CTFShop extends Shop{
         Player player = (Player) event.getWhoClicked();
         String mat = event.getCurrentItem().getType().name();
         if(plugin.manager.playerIn(player)){
-            String mapName = plugin.manager.getMapName(player);
-            Map map = plugin.manager.getMap(mapName);
-            PlayerData data = map.getPlayerData(player);
+            String[] ids = plugin.manager.getMapIds(player);
+            Map map = plugin.manager.getMap(ids[0], ids[1]);
+            PlayerData data = map.playerData.get(player.getUniqueId());
             if(map instanceof CTFMap){
                 CTFMap ctfMap = (CTFMap) map;
                 CTFPlayerData ctfData = (CTFPlayerData) data;
@@ -91,13 +91,12 @@ public class CTFShop extends Shop{
                         break;
                     case "IRON_CHESTPLATE":
                         player.getInventory().setChestplate(new ItemStack(Material.IRON_CHESTPLATE));
-                        player.getInventory().setLeggings(new ItemStack(Material.IRON_LEGGINGS));
                         player.getInventory().setBoots(new ItemStack(Material.IRON_BOOTS));
                         event.setCancelled(true);
                         player.closeInventory();
                         break;
-                    case "GOLD_PICKAXE":
-                        ctfData.buffs.add("haste");
+                    case "SHEARS":
+                        ctfData.buffs.add("shears");
                         event.setCancelled(true);
                         player.closeInventory();
                         ctfMap.readBuffs(player);
@@ -112,9 +111,13 @@ public class CTFShop extends Shop{
                         event.setCancelled(true);
                         player.closeInventory();
                         break;
+                    default:
+                        event.setCancelled(true);
+                        player.closeInventory();
+                        break;
                 }
-                ctfMap.setPlayerData(player, ctfData);
-                plugin.manager.setMap(mapName, ctfMap);
+                ctfMap.playerData.put(player.getUniqueId(), ctfData);
+                plugin.manager.setMap(ids[0], ids[1], ctfMap);
             }
         }
     }
