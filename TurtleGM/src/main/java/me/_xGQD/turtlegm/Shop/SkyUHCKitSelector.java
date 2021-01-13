@@ -24,7 +24,7 @@ public class SkyUHCKitSelector extends Shop{
                 "Gives you gold armor, a enchanting kit (with some bookshelves), along with gold tools"});
         ItemStack rush_kit = ItemUtilities.createItem(Material.STONE, "Rush", new String[]{
                 "Gives you stone blocks and some chainmail and iron armor"});
-        ItemStack alch_kit = ItemUtilities.createItem(Material.BREWING_STAND, "Alchemist", new String[]{
+        ItemStack alch_kit = ItemUtilities.createItem(Material.BREWING_STAND_ITEM, "Alchemist", new String[]{
                 "Give you full chainmail armor and stone tools",
                 "Also a brewing stand, ghast tear, wart, and some bottles"});
         ItemStack fishermen_kit = ItemUtilities.createItem(Material.FISHING_ROD, "Fishermen", new String[]{
@@ -35,7 +35,7 @@ public class SkyUHCKitSelector extends Shop{
         costs.put("IRON_PICKAXE", 0);
         costs.put("ENCHANTMENT_TABLE", 0);
         costs.put("STONE", 0);
-        costs.put("BREWING_STAND", 0);
+        costs.put("BREWING_STAND_ITEM", 0);
         costs.put("FISHING_ROD", 0);
 
         shop.setItem(0, default_kit);
@@ -88,14 +88,14 @@ public class SkyUHCKitSelector extends Shop{
                     event.setCancelled(true);
                     player.closeInventory();
                     break;
-                case "BREWING_STAND":
+                case "BREWING_STAND_ITEM":
                     player.getInventory().setBoots(new ItemStack(Material.CHAINMAIL_BOOTS));
                     player.getInventory().setLeggings(new ItemStack(Material.CHAINMAIL_LEGGINGS));
                     player.getInventory().setChestplate(new ItemStack(Material.CHAINMAIL_CHESTPLATE));
                     player.getInventory().setHelmet(new ItemStack(Material.CHAINMAIL_HELMET));
                     player.getInventory().addItem(new ItemStack(Material.STONE_PICKAXE));
                     player.getInventory().addItem(new ItemStack(Material.STONE_AXE));
-                    player.getInventory().addItem(new ItemStack(Material.BREWING_STAND));
+                    player.getInventory().addItem(new ItemStack(Material.BREWING_STAND_ITEM));
                     player.getInventory().addItem(new ItemStack(Material.GHAST_TEAR));
                     player.getInventory().addItem(new ItemStack(Material.NETHER_WARTS,3));
                     player.getInventory().addItem(new ItemStack(Material.GLASS_BOTTLE,3));
