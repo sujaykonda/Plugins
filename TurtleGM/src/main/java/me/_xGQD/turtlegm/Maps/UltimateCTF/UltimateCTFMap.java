@@ -99,51 +99,50 @@ public class UltimateCTFMap extends CTFMap {
     public UltimateCTFPlayerData getPlayerData(UUID playerUUID){
         return (UltimateCTFPlayerData) playerData.get(playerUUID);
     }
+
     @Override
-    public void onEntityDamage(EntityDamageEvent event){
+    public void onPlayerDamageByPlayer(EntityDamageByEntityEvent event, Player player, Player cause) {
+        if(event.getDamager() instanceof FishHook){
+            if(playerData.containsKey(cause.getUniqueId())){
+                if (getPlayerData(player.getUniqueId()).team == getPlayerData(cause.getUniqueId()).team){
+                    event.setCancelled(true);
+                } else if (getPlayerData(player.getUniqueId()).spawnProt){
+                    event.setCancelled(true);
+                } else {
+                    getPlayerData(player.getUniqueId()).lastHit = cause.getUniqueId();
+                    if(getPlayerData(cause.getUniqueId()).spawnProt){
+                        getPlayerData(cause.getUniqueId()).spawnProt = false;
+                    }
+                }
+            }
+        }
+
+        if(event.getDamager() instanceof Player){
+            if(playerData.containsKey(cause.getUniqueId())){
+                if (getPlayerData(player.getUniqueId()).team == getPlayerData(cause.getUniqueId()).team){
+                    event.setCancelled(true);
+                } else if (getPlayerData(player.getUniqueId()).spawnProt){
+                    event.setCancelled(true);
+                } else {
+                    if(getPlayerData(cause.getUniqueId()).perk == 2){
+                        player.setVelocity(cause.getLocation().getDirection().setY(0).normalize().multiply(0.35));
+                    }
+                    getPlayerData(player.getUniqueId()).lastHit = cause.getUniqueId();
+                    if(getPlayerData(cause.getUniqueId()).spawnProt){
+                        getPlayerData(cause.getUniqueId()).spawnProt = false;
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onPlayerDamage(EntityDamageEvent event){
         if(event.getEntity() instanceof Player){
             final Player player = (Player) event.getEntity();
             UltimateCTFPlayerData data = getPlayerData(player.getUniqueId());
             if(event instanceof EntityDamageByEntityEvent){
                 EntityDamageByEntityEvent e = (EntityDamageByEntityEvent) event;
-
-                if(e.getDamager() instanceof FishHook && ((FishHook) e.getDamager()).getShooter() instanceof Player){
-                    Player damager = (Player) ((FishHook) e.getDamager()).getShooter();
-                    if(playerData.containsKey(damager.getUniqueId())){
-                        UltimateCTFPlayerData damagerData = getPlayerData(damager.getUniqueId());
-                        if (data.team == damagerData.team){
-                            event.setCancelled(true);
-                        } else if (data.spawnProt){
-                            event.setCancelled(true);
-                        } else {
-                            data.lastHit = damager.getUniqueId();
-                            if(damagerData.spawnProt){
-                                damagerData.spawnProt = false;
-                                playerData.put(damager.getUniqueId(), damagerData);
-                            }
-                            playerData.put(player.getUniqueId(), data);
-                        }
-                    }
-                }
-
-                if(e.getDamager() instanceof Player){
-                    Player damager = (Player) e.getDamager();
-
-                    if(playerData.containsKey(damager.getUniqueId())){
-                        UltimateCTFPlayerData damagerData = getPlayerData(damager.getUniqueId());
-                        if (data.team == damagerData.team){
-                            event.setCancelled(true);
-                        } else if (data.spawnProt){
-                            event.setCancelled(true);
-                        } else {
-                            if(damagerData.perk == 2){
-                                player.setVelocity(damager.getLocation().getDirection().setY(0).normalize().multiply(0.35));
-                            }
-                            data.lastHit = damager.getUniqueId();
-                            playerData.put(player.getUniqueId(), data);
-                        }
-                    }
-                }
             }
             if(event.getDamage() >= player.getHealth() || event.getCause().equals(EntityDamageEvent.DamageCause.LAVA)){
                 event.setCancelled(true);

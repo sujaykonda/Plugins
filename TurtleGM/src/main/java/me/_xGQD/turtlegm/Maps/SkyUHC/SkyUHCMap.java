@@ -417,7 +417,7 @@ public class SkyUHCMap extends Map {
     }
 
     @Override
-    public void onEntityDamage(EntityDamageEvent event){
+    public void onPlayerDamage(EntityDamageEvent event){
         if(event.getEntity() instanceof Player){
             final Player player = (Player) event.getEntity();
             if(event.getDamage() >= player.getHealth() || event.getCause().equals(EntityDamageEvent.DamageCause.VOID)){

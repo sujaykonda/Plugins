@@ -15,9 +15,12 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -233,7 +236,27 @@ public class PlayerManager {
         Player player = (Player) event.getEntity();
         String[] map_ids = playerPlace.get(player.getUniqueId()).split(" ");
         Map map = getMap(map_ids[0], map_ids[1]);
-        map.onEntityDamage(event);
+        if(event instanceof EntityDamageByEntityEvent){
+            EntityDamageByEntityEvent e = (EntityDamageByEntityEvent) event;
+            Player cause = null;
+            if(e.getDamager() instanceof Player){
+                if(playerIn((Player) e.getDamager())){
+                    cause = (Player) e.getDamager();
+                }
+            }
+            if(e.getDamager() instanceof Projectile){
+                Projectile proj = (Projectile) e.getDamager();
+                if(proj.getShooter() instanceof Player){
+                    if(playerIn((Player) proj.getShooter())){
+                        cause = (Player) proj.getShooter();
+                    }
+                }
+            }
+            if(cause != null){
+                map.onPlayerDamageByPlayer(e, player, cause);
+            }
+        }
+        map.onPlayerDamage(event);
         setMap(map_ids[0], map_ids[1], map);
     }
 

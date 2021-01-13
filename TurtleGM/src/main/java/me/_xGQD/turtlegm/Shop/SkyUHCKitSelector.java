@@ -25,10 +25,10 @@ public class SkyUHCKitSelector extends Shop{
         ItemStack rush_kit = ItemUtilities.createItem(Material.STONE, "Rush", new String[]{
                 "Gives you stone blocks and "});
         ItemStack snowman_kit = ItemUtilities.createItem(Material.SNOW_BALL, "Snowman", new String[]{
-                "Gives you diamond helmet and leather chestplate, pants, boots",
+                "Gives you diamond helmet and chainmail chestplate, pants, boots",
                 "Also a diamond shovel, stone axe, stone pickaxe and 16 snowballs"});
         ItemStack fishermen_kit = ItemUtilities.createItem(Material.FISHING_ROD, "Fishermen", new String[]{
-                "Gives you leather helmet, chestplate, pants and diamond boots with depth strider",
+                "Gives you chainmail helmet, chestplate, pants and diamond boots with depth strider",
                 "Also a fishing rod with max rod enchants, stone pick and iron axe"});
 
 
@@ -85,9 +85,9 @@ public class SkyUHCKitSelector extends Shop{
                     player.closeInventory();
                     break;
                 case "SNOW_BALL":
-                    player.getInventory().setBoots(new ItemStack(Material.LEATHER_BOOTS));
-                    player.getInventory().setLeggings(new ItemStack(Material.LEATHER_LEGGINGS));
-                    player.getInventory().setChestplate(new ItemStack(Material.LEATHER_CHESTPLATE));
+                    player.getInventory().setBoots(new ItemStack(Material.CHAINMAIL_BOOTS));
+                    player.getInventory().setLeggings(new ItemStack(Material.CHAINMAIL_LEGGINGS));
+                    player.getInventory().setChestplate(new ItemStack(Material.CHAINMAIL_CHESTPLATE));
                     player.getInventory().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
                     ItemStack diamond_shovel = new ItemStack(Material.DIAMOND_SPADE);
                     diamond_shovel.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 2);
@@ -102,9 +102,9 @@ public class SkyUHCKitSelector extends Shop{
                     ItemStack depth_strider_boots = new ItemStack(Material.DIAMOND_BOOTS);
                     depth_strider_boots.addEnchantment(Enchantment.DEPTH_STRIDER, 3);
                     player.getInventory().setBoots(depth_strider_boots);
-                    player.getInventory().setLeggings(new ItemStack(Material.LEATHER_LEGGINGS));
-                    player.getInventory().setChestplate(new ItemStack(Material.LEATHER_CHESTPLATE));
-                    player.getInventory().setHelmet(new ItemStack(Material.LEATHER_HELMET));
+                    player.getInventory().setLeggings(new ItemStack(Material.CHAINMAIL_LEGGINGS));
+                    player.getInventory().setChestplate(new ItemStack(Material.CHAINMAIL_CHESTPLATE));
+                    player.getInventory().setHelmet(new ItemStack(Material.CHAINMAIL_HELMET));
                     player.getInventory().addItem(new ItemStack(Material.IRON_SWORD));
                     ItemStack fishing_rod = new ItemStack(Material.FISHING_ROD);
                     fishing_rod.addEnchantment(Enchantment.LURE, 3);

@@ -415,6 +415,7 @@ public class CTFMap extends Map {
                 config.set("teamSelector", false);
                 player.sendMessage("You have turned off the team selector");
             }
+            saveConfig(config);
         } catch (IOException | InvalidConfigurationException e) {
             e.printStackTrace();
         }
@@ -624,38 +625,28 @@ public class CTFMap extends Map {
         }
         return builder;
     }
+
     @Override
-    public void onEntityDamage(EntityDamageEvent event){
+    public void onPlayerDamageByPlayer(EntityDamageByEntityEvent event, Player player, Player cause) {
+        if(playerData.containsKey(cause.getUniqueId())){
+            if (getPlayerData(player.getUniqueId()).team == getPlayerData(cause.getUniqueId()).team){
+                event.setCancelled(true);
+            } else if (getPlayerData(player.getUniqueId()).spawnProt){
+                event.setCancelled(true);
+            } else {
+                getPlayerData(player.getUniqueId()).lastHit = cause.getUniqueId();
+                if(getPlayerData(cause.getUniqueId()).spawnProt){
+                    getPlayerData(cause.getUniqueId()).spawnProt = false;
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onPlayerDamage(EntityDamageEvent event){
         if(event.getEntity() instanceof Player){
             final Player player = (Player) event.getEntity();
             CTFPlayerData data = getPlayerData(player.getUniqueId());
-            if(event instanceof EntityDamageByEntityEvent){
-                EntityDamageByEntityEvent e = (EntityDamageByEntityEvent) event;
-                Player damager = null;
-                if(e.getDamager() instanceof Projectile && ((Projectile) e.getDamager()).getShooter() instanceof Player){
-                    damager = (Player) ((Projectile) e.getDamager()).getShooter();
-                }
-                if(e.getDamager() instanceof Player){
-                    damager = (Player) e.getDamager();
-                }
-                if(damager != null){
-                    if(playerData.containsKey(damager.getUniqueId())){
-                        CTFPlayerData damagerData = getPlayerData(damager.getUniqueId());
-                        if (data.team == damagerData.team){
-                            event.setCancelled(true);
-                        } else if (data.spawnProt){
-                            event.setCancelled(true);
-                        } else {
-                            data.lastHit = damager.getUniqueId();
-                            if(damagerData.spawnProt){
-                                damagerData.spawnProt = false;
-                                playerData.put(damager.getUniqueId(), damagerData);
-                            }
-                            playerData.put(player.getUniqueId(), data);
-                        }
-                    }
-                }
-            }
             if(event.getDamage() >= player.getHealth() || event.getCause().equals(EntityDamageEvent.DamageCause.LAVA)){
                 event.setCancelled(true);
                 if(data.lastHit != null){

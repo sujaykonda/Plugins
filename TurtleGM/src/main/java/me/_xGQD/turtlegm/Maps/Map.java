@@ -9,9 +9,11 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -100,7 +102,8 @@ public class Map {
     }
     public void onPlayerDrop(PlayerDropItemEvent event){ }
     public void onPlayerInteract(PlayerInteractEvent event){ }
-    public void onEntityDamage(EntityDamageEvent event){ }
+    public void onPlayerDamage(EntityDamageEvent event){ }
+    public void onPlayerDamageByPlayer(EntityDamageByEntityEvent event, Player player, Player cause){ }
     public void onBlockPlace(BlockPlaceEvent event){ }
     public void onBlockBreak(BlockBreakEvent event){ }
     public void onPlayerMove(PlayerMoveEvent event){ }
