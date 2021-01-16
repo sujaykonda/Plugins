@@ -11,7 +11,7 @@ public class CTFPlayerData extends PlayerData {
     public UUID lastHit;
     public List<String> buffs;
     public boolean spawnProt;
-    public boolean capturedFlag;
+    public boolean hasFlag;
 
     public CTFPlayerData(int team) {
         super(team);
@@ -19,6 +19,6 @@ public class CTFPlayerData extends PlayerData {
         this.lastHit = null;
         this.buffs = new ArrayList<>();
         this.spawnProt = false;
-        this.capturedFlag = false;
+        this.hasFlag = false;
     }
 }

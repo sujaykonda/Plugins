@@ -1,7 +1,6 @@
 package me._xGQD.turtlegm.Shop;
 
-import me._xGQD.turtlegm.Maps.CTF.CTFMap;
-import me._xGQD.turtlegm.Maps.CTF.CTFPlayerData;
+import me._xGQD.turtlegm.ItemUtilities;
 import me._xGQD.turtlegm.Maps.Map;
 import me._xGQD.turtlegm.Maps.PlayerData;
 import me._xGQD.turtlegm.Maps.UltimateCTF.UltimateCTFMap;
@@ -11,7 +10,6 @@ import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
@@ -40,7 +38,7 @@ public class UltimateCTFPerks extends Shop{
     @Override
     public void onInventoryClick(InventoryClickEvent event){
         Player player = (Player) event.getWhoClicked();
-        String mat = event.getCurrentItem().getType().name();
+        Material mat = event.getCurrentItem().getType();
         if(plugin.manager.playerIn(player)){
             String[] ids = plugin.manager.getMapIds(player);
             Map map = plugin.manager.getMap(ids[0], ids[1]);
@@ -50,22 +48,22 @@ public class UltimateCTFPerks extends Shop{
                 UltimateCTFPlayerData ctfData = (UltimateCTFPlayerData) data;
                 System.out.println(mat);
                 switch (mat){
-                    case "GOLD_INGOT":
+                    case GOLD_INGOT:
                         ctfData.perk = 1;
                         event.setCancelled(true);
                         player.closeInventory();
                         break;
-                    case "IRON_SWORD":
+                    case IRON_SWORD:
                         ctfData.perk = 2;
                         event.setCancelled(true);
                         player.closeInventory();
                         break;
-                    case "POTION":
+                    case POTION:
                         ctfData.perk = 3;
                         event.setCancelled(true);
                         player.closeInventory();
                         break;
-                    case "ENDER_PEARL":
+                    case ENDER_PEARL:
                         ctfData.perk = 4;
                         event.setCancelled(true);
                         player.closeInventory();

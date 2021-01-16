@@ -1,10 +1,7 @@
 package me._xGQD.turtlegm.Shop;
 
-import me._xGQD.turtlegm.Maps.CTF.CTFMap;
-import me._xGQD.turtlegm.Maps.CTF.CTFPlayerData;
-import me._xGQD.turtlegm.Maps.Map;
+import me._xGQD.turtlegm.ItemUtilities;
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -31,13 +28,6 @@ public class SkyUHCKitSelector extends Shop{
                 "Gives you chainmail helmet, chestplate, pants and diamond boots with depth strider",
                 "Also a fishing rod with max rod enchants, stone pick and iron axe"});
 
-
-        costs.put("IRON_PICKAXE", 0);
-        costs.put("ENCHANTMENT_TABLE", 0);
-        costs.put("STONE", 0);
-        costs.put("BREWING_STAND_ITEM", 0);
-        costs.put("FISHING_ROD", 0);
-
         shop.setItem(0, default_kit);
         shop.setItem(2, ench_kit);
         shop.setItem(4, fishermen_kit);
@@ -47,10 +37,10 @@ public class SkyUHCKitSelector extends Shop{
 
     public void onInventoryClick(InventoryClickEvent event){
         Player player = (Player) event.getWhoClicked();
-        String mat = event.getCurrentItem().getType().name();
+        Material mat = event.getCurrentItem().getType();
         if(plugin.manager.playerIn(player)){
             switch (mat){
-                case "IRON_PICKAXE":
+                case IRON_PICKAXE:
                     player.getInventory().setBoots(new ItemStack(Material.CHAINMAIL_BOOTS));
                     player.getInventory().setLeggings(new ItemStack(Material.CHAINMAIL_LEGGINGS));
                     player.getInventory().setChestplate(new ItemStack(Material.CHAINMAIL_CHESTPLATE));
@@ -61,7 +51,7 @@ public class SkyUHCKitSelector extends Shop{
                     event.setCancelled(true);
                     player.closeInventory();
                     break;
-                case "ENCHANTMENT_TABLE":
+                case ENCHANTMENT_TABLE:
                     player.getInventory().setBoots(new ItemStack(Material.GOLD_BOOTS));
                     player.getInventory().setLeggings(new ItemStack(Material.GOLD_LEGGINGS));
                     player.getInventory().setChestplate(new ItemStack(Material.GOLD_CHESTPLATE));
@@ -70,13 +60,13 @@ public class SkyUHCKitSelector extends Shop{
                     player.getInventory().addItem(new ItemStack(Material.GOLD_PICKAXE));
                     player.getInventory().addItem(new ItemStack(Material.GOLD_SPADE));
                     player.getInventory().addItem(new ItemStack(Material.ENCHANTMENT_TABLE));
-                    player.getInventory().addItem(new ItemStack(Material.EXP_BOTTLE,32));
+                    player.getInventory().addItem(new ItemStack(Material.EXP_BOTTLE,64));
                     player.getInventory().addItem(new ItemStack(Material.BOOKSHELF,4));
-                    player.getInventory().addItem(new ItemStack(351,32,(short) 4));
+                    player.getInventory().addItem(new ItemStack(351,64,(short) 4));
                     event.setCancelled(true);
                     player.closeInventory();
                     break;
-                case "STONE":
+                case STONE:
                     player.getInventory().setBoots(new ItemStack(Material.IRON_BOOTS));
                     player.getInventory().setLeggings(new ItemStack(Material.CHAINMAIL_LEGGINGS));
                     player.getInventory().setChestplate(new ItemStack(Material.IRON_CHESTPLATE));
@@ -88,7 +78,7 @@ public class SkyUHCKitSelector extends Shop{
                     event.setCancelled(true);
                     player.closeInventory();
                     break;
-                case "BREWING_STAND_ITEM":
+                case BREWING_STAND_ITEM:
                     player.getInventory().setBoots(new ItemStack(Material.CHAINMAIL_BOOTS));
                     player.getInventory().setLeggings(new ItemStack(Material.CHAINMAIL_LEGGINGS));
                     player.getInventory().setChestplate(new ItemStack(Material.CHAINMAIL_CHESTPLATE));
@@ -97,12 +87,12 @@ public class SkyUHCKitSelector extends Shop{
                     player.getInventory().addItem(new ItemStack(Material.STONE_AXE));
                     player.getInventory().addItem(new ItemStack(Material.BREWING_STAND_ITEM));
                     player.getInventory().addItem(new ItemStack(Material.GHAST_TEAR));
-                    player.getInventory().addItem(new ItemStack(Material.NETHER_WARTS));
+                    player.getInventory().addItem(new ItemStack(Material.NETHER_STALK,3));
                     player.getInventory().addItem(new ItemStack(Material.GLASS_BOTTLE,3));
                     event.setCancelled(true);
                     player.closeInventory();
                     break;
-                case "FISHING_ROD":
+                case FISHING_ROD:
                     ItemStack depth_strider_boots = new ItemStack(Material.DIAMOND_BOOTS);
                     depth_strider_boots.addEnchantment(Enchantment.DEPTH_STRIDER, 3);
                     player.getInventory().setBoots(depth_strider_boots);

@@ -3,19 +3,25 @@ package me._xGQD.turtlegm.Listeners;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTEntity;
 import de.tr7zw.nbtapi.NBTItem;
+import me._xGQD.turtlegm.Event.LeftClickPlayerEvent;
 import me._xGQD.turtlegm.Main;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.entity.ExplosionPrimeEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
+
+import java.util.ArrayList;
+import java.util.Set;
 
 public class NBTListener implements Listener {
     Main plugin = JavaPlugin.getPlugin(Main.class);
@@ -24,72 +30,78 @@ public class NBTListener implements Listener {
     }
 
     @EventHandler
-    public void onEntityDamage(final EntityDamageByEntityEvent event){
-        if(event.getDamager() instanceof Player){
-            final Player player = (Player) event.getDamager();
-            if(!player.getItemInHand().getType().equals(Material.AIR)){
-                NBTItem nbt = new NBTItem(player.getItemInHand());
-                if(nbt.hasKey("onHit")){
-                    NBTCompound eventCompound = nbt.getCompound("onHit");
-                    for(String modifier : eventCompound.getKeys()){
-                        NBTCompound compound = eventCompound.getCompound(modifier);
-                        switch (modifier){
-                            case "explode":
-                                int delay = 0;
-                                if(compound.hasKey("delay")){
-                                    delay = Integer.parseInt(compound.getString("delay"));
+    public void onEntityClicked(LeftClickPlayerEvent event){
+        final Player player = event.getPlayer();
+        final Player hitPlayer = event.getClickedPlayer();
+        if(player.getItemInHand() != null){
+            NBTItem nbt = new NBTItem(player.getItemInHand());
+            if(nbt.hasKey("onHit")){
+                NBTCompound eventCompound = nbt.getCompound("onHit");
+                for(String modifier : eventCompound.getKeys()){
+                    NBTCompound compound = eventCompound.getCompound(modifier);
+                    switch (modifier){
+                        case "explode":
+                            int delay = 0;
+                            if(compound.hasKey("delay")){
+                                delay = Integer.parseInt(compound.getString("delay"));
+                            }
+                            Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+                                @Override
+                                public void run() {
+                                    TNTPrimed tnt = (TNTPrimed) hitPlayer.getWorld().spawnEntity(hitPlayer.getLocation(), EntityType.PRIMED_TNT);
+                                    tnt.setFuseTicks(0);
                                 }
-                                Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        TNTPrimed tnt = (TNTPrimed) event.getEntity().getWorld().spawnEntity(event.getEntity().getLocation(), EntityType.PRIMED_TNT);
-                                        tnt.setFuseTicks(0);
-                                    }
-                                }, delay);
-                                break;
-                            case "damage":
-                                double damage = 0;
-                                delay = 0;
-                                if(compound.hasKey("damage")){
-                                    damage = Double.parseDouble(compound.getString("damage"));
-                                }
-                                if(compound.hasKey("delay")){
-                                    delay = Integer.parseInt(compound.getString("delay"));
-                                }
-                                final double dm = damage;
-                                Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        if(event.getEntity() instanceof Damageable){
-                                            Damageable entity = (Damageable) event.getEntity();
-                                            if(player.getHealth() < dm){
-                                                entity.setHealth(0);
-                                            } else {
-                                                entity.setHealth(player.getHealth() - dm);
-                                            }
+                            }, delay);
+                            break;
+                        case "command":
+                            String cmd = "";
+                            if(compound.hasKey("cmd")){
+                                cmd = compound.getString("cmd").replaceAll(">", " ");
+                                cmd = cmd.replaceAll("@p", hitPlayer.getName());
+                            }
+                            player.performCommand(cmd);
+                        case "damage":
+                            double damage = 0;
+                            delay = 0;
+                            if(compound.hasKey("damage")){
+                                damage = Double.parseDouble(compound.getString("damage"));
+                            }
+                            if(compound.hasKey("delay")){
+                                delay = Integer.parseInt(compound.getString("delay"));
+                            }
+                            final double dm = damage;
+                            Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+                                @Override
+                                public void run() {
+                                    if(hitPlayer instanceof Damageable){
+                                        Damageable entity = (Damageable) hitPlayer;
+                                        if(player.getHealth() < dm){
+                                            entity.setHealth(0);
+                                        } else {
+                                            entity.setHealth(player.getHealth() - dm);
                                         }
                                     }
-                                }, delay);
-                                break;
-                            case "knockback":
-                                double kb = 0;
-                                delay = 0;
-                                if(compound.hasKey("delay")){
-                                    delay = Integer.parseInt(compound.getString("delay"));
                                 }
-                                if(compound.hasKey("knockback")){
-                                    kb = Double.parseDouble(compound.getString("knockback"));
-                                }
-                                final double kb_adder = kb;
-                                Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        event.getEntity().setVelocity(player.getLocation().getDirection().setY(0).normalize().multiply(kb_adder));
+                            }, delay);
+                            break;
+                        case "knockback":
+                            double kb = 0;
+                            delay = 0;
+                            if(compound.hasKey("delay")){
+                                delay = Integer.parseInt(compound.getString("delay"));
+                            }
+                            if(compound.hasKey("knockback")){
+                                kb = Double.parseDouble(compound.getString("knockback"));
+                            }
+                            final double kb_adder = kb;
+                            Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+                                @Override
+                                public void run() {
+                                    hitPlayer.setVelocity(player.getLocation().getDirection().setY(0).normalize().multiply(kb_adder));
 
-                                    }
-                                }, delay);
-                                break;
-                        }
+                                }
+                            }, delay);
+                            break;
                     }
                 }
             }
@@ -100,6 +112,7 @@ public class NBTListener implements Listener {
     public void onPlayerInteract(final PlayerInteractEvent event){
         Action action = event.getAction();
         final Player player = event.getPlayer();
+
         if(!player.getItemInHand().getType().equals(Material.AIR)){
             NBTItem nbt = new NBTItem(player.getItemInHand());
             if((action.equals(Action.RIGHT_CLICK_BLOCK) || action.equals(Action.LEFT_CLICK_BLOCK)) && nbt.hasKey("onClickBlock")){
@@ -149,7 +162,14 @@ public class NBTListener implements Listener {
                             if(compound.hasKey("distance")){
                                 distance = Double.parseDouble(compound.getString("distance"));
                             }
-                            player.teleport(player.getLocation().add(player.getLocation().getDirection().normalize().multiply(distance)));
+                            if(distance > 0){
+                                Block block = player.getTargetBlock((Set<Material>) null, (int) Math.ceil(distance));
+                                if(block.getType() == Material.AIR){
+                                    player.teleport(player.getLocation().add(player.getLocation().getDirection().normalize().multiply(distance)));
+                                }else{
+                                    player.teleport(player.getLocation().add(player.getLocation().getDirection().normalize().multiply(block.getLocation().distance(player.getLocation())-1.5)));
+                                }
+                            }
                             break;
                         case "arrow":
                             int speed = 1;

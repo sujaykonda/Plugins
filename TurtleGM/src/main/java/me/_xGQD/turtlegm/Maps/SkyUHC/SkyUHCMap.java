@@ -26,7 +26,6 @@ import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.entity.Player;
@@ -36,7 +35,6 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -49,8 +47,6 @@ import java.util.*;
 
 public class SkyUHCMap extends Map {
 
-    private Clipboard map;
-
     protected Random randomGen;
     protected Location[] island_spawns;
     protected List<UUID> playerUUIDs;
@@ -61,7 +57,6 @@ public class SkyUHCMap extends Map {
         super(name, load);
         playerUUIDs = new ArrayList<>();
         randomGen = new Random();
-        island_spawns = new Location[]{null, null, null, null};
     }
 
     public static String getType(){
@@ -129,26 +124,13 @@ public class SkyUHCMap extends Map {
             e.printStackTrace();
         }
     }
-
     @Override
-    public void load(){
+    public void loadAll(){
         try {
             island_spawns = new Location[]{null, null, null, null};
-            File maps_dir = new File(plugin.getDataFolder(), "/maps");
-            if (!maps_dir.exists())
-                maps_dir.mkdirs();
 
-            File map_file = new File(plugin.getDataFolder(), "/maps/" + getType() + name + ".yml");
+            YamlConfiguration config = getConfig();
 
-            File schematics_dir = new File(plugin.getDataFolder(), "/schematics");
-            if (!schematics_dir.exists())
-                schematics_dir.mkdirs();
-
-            File schematic_file = new File(plugin.getDataFolder(), "/schematics/" + getType() + name + ".schematic");
-
-            YamlConfiguration config = new YamlConfiguration();
-
-            config.load(map_file);
             World bukkitWorld = Bukkit.getWorld(config.getString("paste_location.world"));
             com.sk89q.worldedit.world.World worldEditWorld = BukkitUtil.getLocalWorld(bukkitWorld);
             island_spawns[0] = new Location(bukkitWorld,
@@ -172,19 +154,10 @@ public class SkyUHCMap extends Map {
                     config.getDouble("loc4.z"));
 
             buildLimit = config.getInt("buildLimit");
-            ClipboardFormat format = ClipboardFormat.findByFile(schematic_file);
-            ClipboardReader reader = format.getReader(new FileInputStream(schematic_file));
-            map = reader.read(worldEditWorld.getWorldData());
-            EditSession editSession = WorldEdit.getInstance().getEditSessionFactory().getEditSession(worldEditWorld, -1);
-            Operation operation = new ClipboardHolder(map, worldEditWorld.getWorldData())
-                    .createPaste(editSession, worldEditWorld.getWorldData())
-                    .to(map.getMinimumPoint())
-                    .ignoreAirBlocks(false)
-                    .build();
-            Operations.complete(operation);
 
+            loadMap();
 
-        } catch (IOException | InvalidConfigurationException | WorldEditException e) {
+        } catch (IOException | InvalidConfigurationException e) {
             e.printStackTrace();
         }
     }
@@ -309,7 +282,7 @@ public class SkyUHCMap extends Map {
 
     @Override
     public void setupGame() {
-        this.load();
+        this.loadMap();
 
         playerUUIDs = new ArrayList<>();
 
@@ -359,7 +332,7 @@ public class SkyUHCMap extends Map {
 
     @Override
     public void endGame() {
-        this.load();
+        this.loadMap();
         opened = false;
         started = false;
         for(UUID playerUUID: playerData.keySet()){
@@ -417,51 +390,48 @@ public class SkyUHCMap extends Map {
     }
 
     @Override
-    public void onPlayerDamage(EntityDamageEvent event){
-        if(event.getEntity() instanceof Player){
-            final Player player = (Player) event.getEntity();
-            if(event.getDamage() >= player.getHealth() || event.getCause().equals(EntityDamageEvent.DamageCause.VOID)){
-                if(event instanceof EntityDamageByEntityEvent){
-                    EntityDamageByEntityEvent e = (EntityDamageByEntityEvent) event;
-                    if(e.getDamager() instanceof Player){
-                        Player damager = (Player) e.getDamager();
-                        ExperienceOrb orb = (ExperienceOrb) damager.getWorld().spawnEntity(player.getLocation(), EntityType.EXPERIENCE_ORB);
-                        orb.setExperience(10);
-                    }
+    public void onPlayerDamage(EntityDamageEvent event, final Player player){
+        if(event.getDamage() >= player.getHealth() || event.getCause().equals(EntityDamageEvent.DamageCause.VOID)){
+            if(event instanceof EntityDamageByEntityEvent){
+                EntityDamageByEntityEvent e = (EntityDamageByEntityEvent) event;
+                if(e.getDamager() instanceof Player){
+                    Player damager = (Player) e.getDamager();
+                    ExperienceOrb orb = (ExperienceOrb) damager.getWorld().spawnEntity(player.getLocation(), EntityType.EXPERIENCE_ORB);
+                    orb.setExperience(10);
                 }
-                event.setCancelled(true);
-                for(PotionEffect effect : player.getActivePotionEffects()){
-                    player.removePotionEffect(effect.getType());
+            }
+            event.setCancelled(true);
+            for(PotionEffect effect : player.getActivePotionEffects()){
+                player.removePotionEffect(effect.getType());
+            }
+            playerUUIDs.remove(player.getUniqueId());
+            playerData.remove(player.getUniqueId());
+            player.setGameMode(GameMode.SPECTATOR);
+            if(event.getDamage() >= player.getHealth()){
+                for (ItemStack itemStack : player.getInventory()) {
+                    player.getWorld().dropItemNaturally(player.getLocation(), itemStack);
                 }
-                playerUUIDs.remove(player.getUniqueId());
-                playerData.remove(player.getUniqueId());
-                player.setGameMode(GameMode.SPECTATOR);
-                for(ItemStack item : player.getInventory()){
-                    if(item != null){
-                        player.getWorld().dropItem(player.getLocation(), item);
-                    }
+            }
+            if(playerUUIDs.size() <= 1){
+                if(playerUUIDs.size() == 1 && Bukkit.getPlayer(playerUUIDs.get(0)) != null){
+                    TitleAPI.sendTitle(Bukkit.getPlayer(playerUUIDs.get(0)), 5, 20, 5, "Victory", "You were the last man standing");
                 }
-                if(playerUUIDs.size() <= 1){
-                    if(playerUUIDs.size() == 1 && Bukkit.getPlayer(playerUUIDs.get(0)) != null){
-                        TitleAPI.sendTitle(Bukkit.getPlayer(playerUUIDs.get(0)), 5, 20, 5, "Victory", "You were the last man standing");
-                    }
-                    endGame();
-                }else{
-                    player.teleport(Bukkit.getPlayer(playerUUIDs.get(0)));
-                }
-                Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-                    @Override
-                    public void run() {
-                        plugin.manager.gotoLobby(player.getUniqueId());
-                    }
-                }, 40);
-                for(Player onlinePlayer : Bukkit.getOnlinePlayers()){
-                    if(playerData.containsKey(onlinePlayer.getUniqueId())){
-                        onlinePlayer.sendMessage(player.getName() + " has died");
-                    }
+                endGame();
+            }else{
+                player.teleport(Bukkit.getPlayer(playerUUIDs.get(0)));
+            }
+            Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+                @Override
+                public void run() {
+                    plugin.manager.gotoLobby(player.getUniqueId());
+                }}, 40);
+            for(Player onlinePlayer : Bukkit.getOnlinePlayers()){
+                if(playerData.containsKey(onlinePlayer.getUniqueId())){
+                    onlinePlayer.sendMessage(player.getName() + " has died");
                 }
             }
         }
+
     }
 
     protected boolean checkIfDrops(ItemStack tool, Block block){
@@ -543,17 +513,22 @@ public class SkyUHCMap extends Map {
     @Override
     public void onBlockPlace(BlockPlaceEvent event){
         final Block block = event.getBlock();
-        if(buildLimit != -1 && buildLimit < Math.floor(block.getLocation().getY())){
+        if(!(new Vector(block.getX(), block.getY(), block.getZ()).containedWithin(map.getMinimumPoint(), map.getMaximumPoint()))){
             event.getPlayer().sendMessage("Build limit reached");
             event.setCancelled(true);
         }
     }
     @Override
-    public void onPlayerInteract(PlayerInteractEvent event) {
+    public void onPlayerInteract(final PlayerInteractEvent event) {
         if(event.getAction().equals(Action.RIGHT_CLICK_AIR) || event.getAction().equals(Action.RIGHT_CLICK_BLOCK)){
             if(event.getPlayer().getItemInHand().getType().equals(Material.COOKIE)){
-                event.getPlayer().getItemInHand().setType(Material.AIR);
-                event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 0));
+                Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+                    @Override
+                    public void run() {
+                        event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 0));
+                        event.getPlayer().setItemInHand(null);
+                    }
+                });
             }
         }
     }

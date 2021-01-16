@@ -1,15 +1,26 @@
 package me._xGQD.turtlegm.Maps;
 
+import com.sk89q.worldedit.*;
+import com.sk89q.worldedit.bukkit.BukkitUtil;
+import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
+import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
+import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
+import com.sk89q.worldedit.function.operation.Operation;
+import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.session.ClipboardHolder;
 import me._xGQD.turtlegm.Main;
-import me._xGQD.turtlegm.Schematic;
 import me._xGQD.turtlegm.scoreboard.common.EntryBuilder;
 import net.citizensnpcs.api.npc.NPC;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -34,10 +45,11 @@ public class Map {
     protected static Main plugin = JavaPlugin.getPlugin(Main.class);
     protected String name;
     protected String type;
+    protected Clipboard map;
     public Map(String name, boolean load){
         this.name = name;
         if(load){
-            load();
+            loadAll();
         }
         opened = false;
         npcs = new ArrayList<>();
@@ -102,16 +114,74 @@ public class Map {
     }
     public void onPlayerDrop(PlayerDropItemEvent event){ }
     public void onPlayerInteract(PlayerInteractEvent event){ }
-    public void onPlayerDamage(EntityDamageEvent event){ }
+    public void onPlayerDamage(EntityDamageEvent event, Player player){ }
     public void onPlayerDamageByPlayer(EntityDamageByEntityEvent event, Player player, Player cause){ }
     public void onBlockPlace(BlockPlaceEvent event){ }
     public void onBlockBreak(BlockBreakEvent event){ }
     public void onPlayerMove(PlayerMoveEvent event){ }
 
-    public void load(){ }
+    public void loadMap(){
+        try {
+            File schematic_file = getSchematicFile();
+
+            YamlConfiguration config = getConfig();
+
+            World bukkitWorld = Bukkit.getWorld(config.getString("paste_location.world"));
+            com.sk89q.worldedit.world.World worldEditWorld = BukkitUtil.getLocalWorld(bukkitWorld);
+
+            ClipboardFormat format = ClipboardFormat.findByFile(schematic_file);
+            assert format != null;
+            ClipboardReader reader = format.getReader(new FileInputStream(schematic_file));
+            map = reader.read(worldEditWorld.getWorldData());
+            EditSession editSession = WorldEdit.getInstance().getEditSessionFactory().getEditSession(worldEditWorld, -1);
+            Operation operation = new ClipboardHolder(map, worldEditWorld.getWorldData())
+                    .createPaste(editSession, worldEditWorld.getWorldData())
+                    .to(map.getMinimumPoint())
+                    .ignoreAirBlocks(false)
+                    .build();
+            Operations.complete(operation);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+    public void loadAll(){ }
     public EntryBuilder updateBoard(EntryBuilder builder, Player player){
         return builder;
     }
-    public void saveMap(Player player) { }
+    public void saveMap(Player player) {
+        try {
+            YamlConfiguration config = getConfig();
+
+            config.set("paste_location.world", plugin.wep.getSelection(player).getMinimumPoint().getWorld().getName());
+
+            config.set("type", getType());
+
+            saveConfig(config);
+
+            File schematic_file = getSchematicFile();
+
+            LocalPlayer localPlayer = plugin.wep.wrapPlayer(player);
+            LocalSession localSession = plugin.we.getSession(localPlayer);
+
+            com.sk89q.worldedit.world.World world = plugin.wep.getSelection(player).getRegionSelector().getWorld();
+            Vector max = plugin.wep.getSelection(player).getNativeMaximumPoint();
+            Vector min = plugin.wep.getSelection(player).getNativeMinimumPoint();
+
+            CuboidRegion region = new CuboidRegion(world, min, max);
+            BlockArrayClipboard clipboard = new BlockArrayClipboard(region);
+            EditSession editSession = WorldEdit.getInstance().getEditSessionFactory().getEditSession(world, -1);
+            ForwardExtentCopy forwardExtentCopy = new ForwardExtentCopy(
+                    editSession, region, clipboard, region.getMinimumPoint()
+            );
+            // configure here
+            Operations.complete(forwardExtentCopy);
+            ClipboardWriter writer = ClipboardFormat.SCHEMATIC.getWriter(new FileOutputStream(schematic_file));
+            writer.write(clipboard, world.getWorldData());
+            writer.close();
+
+        } catch (IOException | WorldEditException | InvalidConfigurationException e) {
+            e.printStackTrace();
+        }
+    }
 
 }

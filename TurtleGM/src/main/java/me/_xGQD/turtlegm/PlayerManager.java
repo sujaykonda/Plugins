@@ -5,7 +5,6 @@ import me._xGQD.turtlegm.Maps.Map;
 import me._xGQD.turtlegm.Maps.RankedCTF.RankedCTFMap;
 import me._xGQD.turtlegm.Maps.SkyUHC.SkyUHCMap;
 import me._xGQD.turtlegm.Maps.UltimateCTF.UltimateCTFMap;
-import me._xGQD.turtlegm.Shop.ItemUtilities;
 import me._xGQD.turtlegm.scoreboard.common.EntryBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -20,7 +19,6 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -138,13 +136,15 @@ public class PlayerManager {
             public void run() {
                 try {
                     File file = new File(plugin.getDataFolder(), "/lobby.yml");
-                    if(file.exists() && Bukkit.getPlayer(uuid) != null) {
-                        YamlConfiguration config = new YamlConfiguration();
-                        config.load(file);
+                    if(Bukkit.getPlayer(uuid) != null){
+                        if(file.exists()) {
+                            YamlConfiguration config = new YamlConfiguration();
+                            config.load(file);
 
-                        Bukkit.getPlayer(uuid).teleport(new Location(Bukkit.getWorld(config.getString("world")), config.getDouble("x"), config.getDouble("y"), config.getDouble("z")));
-                    }else{
-                        Bukkit.getPlayer(uuid).setHealth(0);
+                            Bukkit.getPlayer(uuid).teleport(new Location(Bukkit.getWorld(config.getString("world")), config.getDouble("x"), config.getDouble("y"), config.getDouble("z")));
+                        }else{
+                            Bukkit.getPlayer(uuid).setHealth(0);
+                        }
                     }
                 } catch (IOException | InvalidConfigurationException e) {
                     e.printStackTrace();
@@ -230,34 +230,33 @@ public class PlayerManager {
     }
 
     public void entityDamage(EntityDamageEvent event){
-        if(!(event.getEntity() instanceof Player)){
-            return;
-        }
-        Player player = (Player) event.getEntity();
-        String[] map_ids = playerPlace.get(player.getUniqueId()).split(" ");
-        Map map = getMap(map_ids[0], map_ids[1]);
-        if(event instanceof EntityDamageByEntityEvent){
-            EntityDamageByEntityEvent e = (EntityDamageByEntityEvent) event;
-            Player cause = null;
-            if(e.getDamager() instanceof Player){
-                if(playerIn((Player) e.getDamager())){
-                    cause = (Player) e.getDamager();
-                }
-            }
-            if(e.getDamager() instanceof Projectile){
-                Projectile proj = (Projectile) e.getDamager();
-                if(proj.getShooter() instanceof Player){
-                    if(playerIn((Player) proj.getShooter())){
-                        cause = (Player) proj.getShooter();
+        if(event.getEntity() instanceof Player){
+            Player player = (Player) event.getEntity();
+            String[] map_ids = playerPlace.get(player.getUniqueId()).split(" ");
+            Map map = getMap(map_ids[0], map_ids[1]);
+            if(event instanceof EntityDamageByEntityEvent){
+                EntityDamageByEntityEvent e = (EntityDamageByEntityEvent) event;
+                Player cause = null;
+                if(e.getDamager() instanceof Player){
+                    if(playerIn((Player) e.getDamager())){
+                        cause = (Player) e.getDamager();
                     }
                 }
+                if(e.getDamager() instanceof Projectile){
+                    Projectile proj = (Projectile) e.getDamager();
+                    if(proj.getShooter() instanceof Player){
+                        if(playerIn((Player) proj.getShooter())){
+                            cause = (Player) proj.getShooter();
+                        }
+                    }
+                }
+                if(cause != null){
+                    map.onPlayerDamageByPlayer(e, player, cause);
+                }
             }
-            if(cause != null){
-                map.onPlayerDamageByPlayer(e, player, cause);
-            }
+            map.onPlayerDamage(event, player);
+            setMap(map_ids[0], map_ids[1], map);
         }
-        map.onPlayerDamage(event);
-        setMap(map_ids[0], map_ids[1], map);
     }
 
     public void blockPlace(BlockPlaceEvent event){
@@ -284,7 +283,7 @@ public class PlayerManager {
             maps.put(type, new HashMap<String, Map>());
         }
         HashMap<String, Map> maps_with_types = maps.get(type);
-        maps_with_types.put(name, (Map) map_class.getConstructor(String.class, boolean.class).newInstance(name, true));
+        maps_with_types.put(name, (Map) map_class.getConstructor(String.class, boolean.class).newInstance(name, false));
 
     }
     public void removeMap(String type, String name){

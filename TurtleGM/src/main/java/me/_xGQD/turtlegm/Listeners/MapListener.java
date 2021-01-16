@@ -123,11 +123,13 @@ public class MapListener implements Listener {
         }
         for(String map_type : plugin.manager.mapInventories.keySet()){
             if(plugin.manager.mapInventories.get(map_type).equals(event.getInventory())){
-                String map_name = event.getCurrentItem().getItemMeta().getDisplayName();
-                event.setCancelled(true);
-                event.getWhoClicked().closeInventory();
-                Bukkit.dispatchCommand(event.getWhoClicked(), "tg join " + map_type + " " + map_name);
-                break;
+                if(event.getCurrentItem() != null){
+                    String map_name = event.getCurrentItem().getItemMeta().getDisplayName();
+                    event.setCancelled(true);
+                    event.getWhoClicked().closeInventory();
+                    Bukkit.dispatchCommand(event.getWhoClicked(), "tg join " + map_type + " " + map_name);
+                    break;
+                }
             }
         }
         for(String shop : plugin.shops.keySet()){

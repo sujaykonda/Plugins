@@ -1,5 +1,6 @@
 package me._xGQD.turtlegm.Shop;
 
+import me._xGQD.turtlegm.ItemUtilities;
 import me._xGQD.turtlegm.Maps.CTF.CTFMap;
 import me._xGQD.turtlegm.Maps.CTF.CTFPlayerData;
 import me._xGQD.turtlegm.Maps.Map;
@@ -9,7 +10,6 @@ import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
@@ -20,7 +20,7 @@ public class CTFShop extends Shop{
         costs = new HashMap<>();
         shop = Bukkit.createInventory(null, 9);
 
-        ItemStack permchain = ItemUtilities.createItem(Material.GOLD_CHESTPLATE, "Gold Armor",
+        ItemStack permgold = ItemUtilities.createItem(Material.GOLD_CHESTPLATE, "Gold Armor",
                 new String[]{"Permanent Gold Chestplate, Leggings, Boots", "Cost 50 Gold"});
         ItemStack permsword = ItemUtilities.createItem(Material.GOLD_SWORD, "Sharp 2 Gold Sword",
                 new String[]{"Permanent Sharpness 2 Golden Sword", "Cost 50 Gold"});
@@ -36,15 +36,15 @@ public class CTFShop extends Shop{
         ItemStack snow = ItemUtilities.createItem(Material.SNOW_BLOCK, "Snow Block",
                 new String[]{"Temporary Snow Blocks for longer break time", "Cost 20 Gold (4 per)"});
 
-        costs.put("GOLD_CHESTPLATE", 50);
-        costs.put("GOLD_SWORD", 50);
-        costs.put("DIAMOND_SWORD", 25);
-        costs.put("IRON_CHESTPLATE", 50);
-        costs.put("SHEARS", 50);
-        costs.put("FISHING_ROD", 50);
-        costs.put("SNOW_BLOCK", 20);
+        costs.put(permgold.getType(), 50);
+        costs.put(permsword.getType(), 50);
+        costs.put(sword.getType(), 25);
+        costs.put(iron.getType(), 50);
+        costs.put(shears.getType(), 50);
+        costs.put(rod.getType(), 50);
+        costs.put(snow.getType(), 20);
 
-        shop.setItem(0, permchain);
+        shop.setItem(0, permgold);
         shop.setItem(1, permsword);
         shop.setItem(2, sword);
         shop.setItem(3, iron);
@@ -55,58 +55,55 @@ public class CTFShop extends Shop{
 
     public void onInventoryClick(InventoryClickEvent event){
         Player player = (Player) event.getWhoClicked();
-        String mat = event.getCurrentItem().getType().name();
+        Material mat = event.getCurrentItem().getType();
         if(plugin.manager.playerIn(player)){
             String[] ids = plugin.manager.getMapIds(player);
             Map map = plugin.manager.getMap(ids[0], ids[1]);
-            PlayerData data = map.playerData.get(player.getUniqueId());
             if(map instanceof CTFMap){
-                CTFMap ctfMap = (CTFMap) map;
-                CTFPlayerData ctfData = (CTFPlayerData) data;
-                int new_gold = onBuy(player, mat, ctfData.gold);
+                int new_gold = onBuy(player, mat, ((CTFMap) map).getPlayerData(player.getUniqueId()).gold);
                 if(new_gold < 0){
                     player.sendMessage("Not enough gold to buy this item");
                     event.setCancelled(true);
                     player.closeInventory();
                     return;
                 }
-                ctfData.gold = new_gold;
+                ((CTFMap) map).getPlayerData(player.getUniqueId()).gold = new_gold;
                 switch (mat){
-                    case "GOLD_CHESTPLATE":
-                        ctfData.buffs.add("permarmor");
+                    case GOLD_CHESTPLATE:
+                        ((CTFMap) map).getPlayerData(player.getUniqueId()).buffs.add("permarmor");
                         event.setCancelled(true);
                         player.closeInventory();
-                        ctfMap.readBuffs(player);
+                        ((CTFMap) map).readBuffs(player);
                         break;
-                    case "GOLD_SWORD":
-                        ctfData.buffs.add("permsword");
+                    case GOLD_SWORD:
+                        ((CTFMap) map).getPlayerData(player.getUniqueId()).buffs.add("permsword");
                         event.setCancelled(true);
                         player.closeInventory();
-                        ctfMap.readBuffs(player);
+                        ((CTFMap) map).readBuffs(player);
                         break;
-                    case "DIAMOND_SWORD":
-                        player.getInventory().setItem(ctfMap.kits.get(player.getUniqueId()).sword, new ItemStack(Material.DIAMOND_SWORD));
+                    case DIAMOND_SWORD:
+                        player.getInventory().setItem(((CTFMap) map).kits.get(player.getUniqueId()).sword, new ItemStack(Material.DIAMOND_SWORD));
                         event.setCancelled(true);
                         player.closeInventory();
                         break;
-                    case "IRON_CHESTPLATE":
+                    case IRON_CHESTPLATE:
                         player.getInventory().setChestplate(new ItemStack(Material.IRON_CHESTPLATE));
                         player.getInventory().setBoots(new ItemStack(Material.IRON_BOOTS));
                         event.setCancelled(true);
                         player.closeInventory();
                         break;
-                    case "SHEARS":
-                        ctfData.buffs.add("shears");
+                    case SHEARS:
+                        ((CTFMap) map).getPlayerData(player.getUniqueId()).buffs.add("shears");
                         event.setCancelled(true);
                         player.closeInventory();
-                        ctfMap.readBuffs(player);
+                        ((CTFMap) map).readBuffs(player);
                         break;
-                    case "FISHING_ROD":
+                    case FISHING_ROD:
                         player.getInventory().addItem(new ItemStack(Material.FISHING_ROD));
                         event.setCancelled(true);
                         player.closeInventory();
                         break;
-                    case "SNOW_BLOCK":
+                    case SNOW_BLOCK:
                         player.getInventory().addItem(new ItemStack(Material.SNOW_BLOCK, 4));
                         event.setCancelled(true);
                         player.closeInventory();
@@ -116,8 +113,6 @@ public class CTFShop extends Shop{
                         player.closeInventory();
                         break;
                 }
-                ctfMap.playerData.put(player.getUniqueId(), ctfData);
-                plugin.manager.setMap(ids[0], ids[1], ctfMap);
             }
         }
     }

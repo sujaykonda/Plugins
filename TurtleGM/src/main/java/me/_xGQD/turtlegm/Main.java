@@ -17,6 +17,10 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.inventivetalent.packetlistener.PacketListenerAPI;
+import org.inventivetalent.packetlistener.handler.PacketHandler;
+import org.inventivetalent.packetlistener.handler.ReceivedPacket;
+import org.inventivetalent.packetlistener.handler.SentPacket;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -43,9 +47,10 @@ public class Main extends JavaPlugin {
         shops = new HashMap<>();
         shops.put("ctf", new CTFShop());
         shops.put("uctfPerks", new UltimateCTFPerks());
-        shops.put("uctf", new UltimateCTFShop());
         shops.put("team_selector_ctf", new CTFTeamSelector());
         shops.put("skyuhckits", new SkyUHCKitSelector());
+
+        new PacketManager();
 
         new MapListener();
         new NBTListener();

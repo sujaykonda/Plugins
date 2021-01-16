@@ -1,4 +1,4 @@
-package me._xGQD.turtlegm.Shop;
+package me._xGQD.turtlegm;
 
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;

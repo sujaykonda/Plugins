@@ -166,7 +166,7 @@ public class IllegalItemCommand implements CommandExecutor {
                         ItemStack item;
                         if(commandSender instanceof Player && player.getItemInHand().getType() != Material.AIR){
                             item = player.getItemInHand();
-                            item.addEnchantment(Enchantment.getByName(args[1].toUpperCase()), Integer.parseInt(args[2]));
+                            item.addUnsafeEnchantment(Enchantment.getByName(args[1].toUpperCase()), Integer.parseInt(args[2]));
                             player.setItemInHand(item);
                         }else if(itemCache.containsKey(commandSender.getName())){
                             item = itemCache.get(commandSender.getName());

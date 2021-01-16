@@ -1,4 +1,4 @@
-package me._xGQD.turtlegm.Maps;
+package me._xGQD.turtlegm;
 
 import org.bukkit.Location;
 

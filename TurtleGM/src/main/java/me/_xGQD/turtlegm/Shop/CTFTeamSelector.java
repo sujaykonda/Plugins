@@ -1,12 +1,11 @@
 package me._xGQD.turtlegm.Shop;
 
+import me._xGQD.turtlegm.ItemUtilities;
 import me._xGQD.turtlegm.Maps.CTF.CTFMap;
 import me._xGQD.turtlegm.Maps.CTF.CTFPlayerData;
 import me._xGQD.turtlegm.Maps.Map;
-import me._xGQD.turtlegm.Maps.PlayerData;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -25,16 +24,13 @@ public class CTFTeamSelector extends Shop{
         ItemStack lapis_block = ItemUtilities.createItem(Material.LAPIS_BLOCK, "Blue Team", new String[]{
                 "Click me to join blue team"});
 
-        costs.put("REDSTONE_BLOCK", 0);
-        costs.put("LAPIS_BLOCK", 0);
-
         shop.setItem(1, redstone_block);
         shop.setItem(7, lapis_block);
     }
 
     public void onInventoryClick(InventoryClickEvent event){
         Player player = (Player) event.getWhoClicked();
-        String mat = event.getCurrentItem().getType().name();
+        Material mat = event.getCurrentItem().getType();
         if(plugin.manager.playerIn(player)){
             String[] ids = plugin.manager.getMapIds(player);
             Map map = plugin.manager.getMap(ids[0], ids[1]);
@@ -42,7 +38,7 @@ public class CTFTeamSelector extends Shop{
                 CTFMap ctfMap = (CTFMap) map;
                 CTFPlayerData ctfData;
                 switch (mat){
-                    case "REDSTONE_BLOCK":
+                    case REDSTONE_BLOCK:
                         ctfData = new CTFPlayerData(0);
                         ctfMap.playerData.put(player.getUniqueId(), ctfData);
                         ctfMap.spawn(player, 0);
@@ -51,7 +47,7 @@ public class CTFTeamSelector extends Shop{
                         event.setCancelled(true);
                         player.closeInventory();
                         break;
-                    case "LAPIS_BLOCK":
+                    case LAPIS_BLOCK:
                         ctfData = new CTFPlayerData(1);
                         ctfMap.playerData.put(player.getUniqueId(), ctfData);
                         ctfMap.spawn(player, 1);
@@ -61,6 +57,8 @@ public class CTFTeamSelector extends Shop{
                         player.closeInventory();
                         break;
                     default:
+                        event.setCancelled(true);
+                        player.closeInventory();
                         break;
                 }
                 plugin.manager.setMap(ids[0], ids[1], ctfMap);

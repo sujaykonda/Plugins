@@ -1,6 +1,7 @@
 package me._xGQD.turtlegm.Shop;
 
 import me._xGQD.turtlegm.Main;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
@@ -10,7 +11,7 @@ import java.util.HashMap;
 
 public class Shop {
     protected Main plugin;
-    protected HashMap<String, Integer> costs;
+    protected HashMap<Material, Integer> costs;
     protected Inventory shop;
     public Shop(){
         plugin = JavaPlugin.getPlugin(Main.class);
@@ -19,7 +20,7 @@ public class Shop {
     public boolean isShop(Inventory inv){
         return inv.equals(shop);
     }
-    public int onBuy(Player player, String material, int gold){
+    public int onBuy(Player player, Material material, int gold){
         if(costs.containsKey(material)){
             if(costs.get(material) <= gold){
                 gold -= costs.get(material);
