@@ -108,6 +108,7 @@ public class SkyUHCKitSelector extends Shop{
                     player.getInventory().addItem(new ItemStack(Material.WOOD_PICKAXE));
                     player.getInventory().addItem(new ItemStack(Material.STONE_AXE));
                     player.getInventory().addItem(new ItemStack(Material.WATER_BUCKET));
+                    player.getInventory().addItem(new ItemStack(Material.ANVIL));
                     event.setCancelled(true);
                     player.closeInventory();
                     break;
