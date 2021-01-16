@@ -77,7 +77,8 @@ public class SkyUHCMap extends Map {
             player.setGameMode(GameMode.SURVIVAL);
             player.setLevel(0);
             player.setExp(0);
-            player.setHealth(20.0D);
+            player.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, 9999999, 4));
+            player.setHealth(40.0D);
             player.setFoodLevel(20);
             player.getInventory().clear();
             plugin.shops.get("skyuhckits").open(player);
