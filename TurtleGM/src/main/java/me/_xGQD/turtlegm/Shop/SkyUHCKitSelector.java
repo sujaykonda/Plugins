@@ -60,7 +60,7 @@ public class SkyUHCKitSelector extends Shop{
                     player.getInventory().addItem(new ItemStack(Material.GOLD_PICKAXE));
                     player.getInventory().addItem(new ItemStack(Material.GOLD_SPADE));
                     player.getInventory().addItem(new ItemStack(Material.ENCHANTMENT_TABLE));
-                    player.getInventory().addItem(new ItemStack(Material.EXP_BOTTLE,64));
+                    player.getInventory().addItem(new ItemStack(Material.EXP_BOTTLE,20));
                     player.getInventory().addItem(new ItemStack(Material.BOOKSHELF,4));
                     player.getInventory().addItem(new ItemStack(351,64,(short) 4));
                     event.setCancelled(true);
@@ -87,7 +87,7 @@ public class SkyUHCKitSelector extends Shop{
                     player.getInventory().addItem(new ItemStack(Material.STONE_AXE));
                     player.getInventory().addItem(new ItemStack(Material.BREWING_STAND_ITEM));
                     player.getInventory().addItem(new ItemStack(Material.GHAST_TEAR));
-                    player.getInventory().addItem(new ItemStack(Material.NETHER_STALK,3));
+                    player.getInventory().addItem(new ItemStack(Material.NETHER_STALK,1));
                     player.getInventory().addItem(new ItemStack(Material.GLASS_BOTTLE,3));
                     event.setCancelled(true);
                     player.closeInventory();
