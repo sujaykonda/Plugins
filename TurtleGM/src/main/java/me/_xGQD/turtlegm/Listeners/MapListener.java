@@ -23,6 +23,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.List;
 
@@ -123,7 +124,7 @@ public class MapListener implements Listener {
         }
         for(String map_type : plugin.manager.mapInventories.keySet()){
             if(plugin.manager.mapInventories.get(map_type).equals(event.getInventory())){
-                if(event.getCurrentItem() != null){
+                if(event.getCurrentItem() != null && event.getCurrentItem().hasItemMeta()){
                     String map_name = event.getCurrentItem().getItemMeta().getDisplayName();
                     event.setCancelled(true);
                     event.getWhoClicked().closeInventory();

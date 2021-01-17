@@ -77,54 +77,21 @@ public class SkyUHCMap extends Map {
             player.setGameMode(GameMode.SURVIVAL);
             player.setLevel(0);
             player.setExp(0);
+            for(PotionEffect effect : player.getActivePotionEffects()){
+                player.removePotionEffect(effect.getType());
+            }
             player.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, 9999999, 4));
             player.setHealth(40.0D);
             player.setFoodLevel(20);
             player.getInventory().clear();
+            player.getInventory().setBoots(null);
+            player.getInventory().setLeggings(null);
+            player.getInventory().setChestplate(null);
+            player.getInventory().setHelmet(null);
             plugin.shops.get("skyuhckits").open(player);
         }
     }
 
-    @Override
-    public void saveMap(Player player){
-        try {
-            YamlConfiguration config = getConfig();
-
-            config.set("paste_location.world", plugin.wep.getSelection(player).getMinimumPoint().getWorld().getName());
-
-            buildLimit = (int) plugin.wep.getSelection(player).getMaximumPoint().getY() - 2;
-
-            config.set("buildLimit", buildLimit);
-
-            config.set("type", getType());
-
-            saveConfig(config);
-
-            File schematic_file = getSchematicFile();
-
-            LocalPlayer localPlayer = plugin.wep.wrapPlayer(player);
-            LocalSession localSession = plugin.we.getSession(localPlayer);
-
-            com.sk89q.worldedit.world.World world = plugin.wep.getSelection(player).getRegionSelector().getWorld();
-            Vector max = plugin.wep.getSelection(player).getNativeMaximumPoint();
-            Vector min = plugin.wep.getSelection(player).getNativeMinimumPoint();
-
-            CuboidRegion region = new CuboidRegion(world, min, max);
-            BlockArrayClipboard clipboard = new BlockArrayClipboard(region);
-            EditSession editSession = WorldEdit.getInstance().getEditSessionFactory().getEditSession(world, -1);
-            ForwardExtentCopy forwardExtentCopy = new ForwardExtentCopy(
-                    editSession, region, clipboard, region.getMinimumPoint()
-            );
-            // configure here
-            Operations.complete(forwardExtentCopy);
-            ClipboardWriter writer = ClipboardFormat.SCHEMATIC.getWriter(new FileOutputStream(schematic_file));
-            writer.write(clipboard, world.getWorldData());
-            writer.close();
-
-        } catch (IOException | WorldEditException | InvalidConfigurationException e) {
-            e.printStackTrace();
-        }
-    }
     @Override
     public void loadAll(){
         try {

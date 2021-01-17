@@ -215,6 +215,10 @@ public class CTFMap extends Map {
     public void spawn(Player player, int team){
         player.teleport(Utilities.lookAt(spawn[team], spawn[(team + 1) % 2]));
         player.setGameMode(GameMode.SURVIVAL);
+        for(PotionEffect effect : player.getActivePotionEffects()){
+            player.removePotionEffect(effect.getType());
+        }
+        player.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 999999, 255));
         player.setHealth(20.0D);
         player.setFoodLevel(20);
         ItemStack helm = new ItemStack(Material.LEATHER_HELMET);
@@ -542,10 +546,6 @@ public class CTFMap extends Map {
                 lastHitPlayer.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 100, 0));
                 getPlayerData(data.lastHit).gold += 10;
             }
-            for(PotionEffect effect : player.getActivePotionEffects()){
-                player.removePotionEffect(effect.getType());
-            }
-            player.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 999999, 255));
             (getPlayerData(player.getUniqueId())).hasFlag = false;
             (getPlayerData(player.getUniqueId())).spawnProt = true;
             (getPlayerData(player.getUniqueId())).lastHit = null;

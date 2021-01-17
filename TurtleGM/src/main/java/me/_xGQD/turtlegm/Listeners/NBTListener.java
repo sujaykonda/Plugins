@@ -1,26 +1,19 @@
 package me._xGQD.turtlegm.Listeners;
 
 import de.tr7zw.nbtapi.NBTCompound;
-import de.tr7zw.nbtapi.NBTEntity;
 import de.tr7zw.nbtapi.NBTItem;
-import me._xGQD.turtlegm.Event.LeftClickPlayerEvent;
+import me._xGQD.turtlegm.Event.LeftClickEntityEvent;
 import me._xGQD.turtlegm.Main;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
 import java.util.Set;
 
 public class NBTListener implements Listener {
@@ -30,10 +23,10 @@ public class NBTListener implements Listener {
     }
 
     @EventHandler
-    public void onEntityClicked(LeftClickPlayerEvent event){
+    public void onEntityClicked(LeftClickEntityEvent event){
         final Player player = event.getPlayer();
-        final Player hitPlayer = event.getClickedPlayer();
-        if(player.getItemInHand() != null){
+        final Entity hitEntity = event.getClickedPlayer();
+        if(player != null && player.getItemInHand() != null){
             NBTItem nbt = new NBTItem(player.getItemInHand());
             if(nbt.hasKey("onHit")){
                 NBTCompound eventCompound = nbt.getCompound("onHit");
@@ -42,14 +35,19 @@ public class NBTListener implements Listener {
                     switch (modifier){
                         case "explode":
                             int delay = 0;
+                            int fuse = 0;
                             if(compound.hasKey("delay")){
                                 delay = Integer.parseInt(compound.getString("delay"));
                             }
+                            if(compound.hasKey("fuse")){
+                                fuse = Integer.parseInt(compound.getString("fuse"));
+                            }
+                            final int finalFuse = fuse;
                             Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
                                 @Override
                                 public void run() {
-                                    TNTPrimed tnt = (TNTPrimed) hitPlayer.getWorld().spawnEntity(hitPlayer.getLocation(), EntityType.PRIMED_TNT);
-                                    tnt.setFuseTicks(0);
+                                    TNTPrimed tnt = (TNTPrimed) hitEntity.getWorld().spawnEntity(hitEntity.getLocation(), EntityType.PRIMED_TNT);
+                                    tnt.setFuseTicks(finalFuse);
                                 }
                             }, delay);
                             break;
@@ -57,7 +55,7 @@ public class NBTListener implements Listener {
                             String cmd = "";
                             if(compound.hasKey("cmd")){
                                 cmd = compound.getString("cmd").replaceAll(">", " ");
-                                cmd = cmd.replaceAll("@p", hitPlayer.getName());
+                                cmd = cmd.replaceAll("@p", hitEntity.getName());
                             }
                             player.performCommand(cmd);
                         case "damage":
@@ -73,8 +71,8 @@ public class NBTListener implements Listener {
                             Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
                                 @Override
                                 public void run() {
-                                    if(hitPlayer instanceof Damageable){
-                                        Damageable entity = (Damageable) hitPlayer;
+                                    if(hitEntity instanceof Damageable){
+                                        Damageable entity = (Damageable) hitEntity;
                                         if(player.getHealth() < dm){
                                             entity.setHealth(0);
                                         } else {
@@ -97,7 +95,7 @@ public class NBTListener implements Listener {
                             Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
                                 @Override
                                 public void run() {
-                                    hitPlayer.setVelocity(player.getLocation().getDirection().setY(0).normalize().multiply(kb_adder));
+                                    hitEntity.setVelocity(player.getLocation().getDirection().setY(0).normalize().multiply(kb_adder));
 
                                 }
                             }, delay);
@@ -122,14 +120,19 @@ public class NBTListener implements Listener {
                     switch (modifier){
                         case "explode":
                             int delay = 0;
+                            int fuse = 0;
                             if(compound.hasKey("delay")){
                                 delay = Integer.parseInt(compound.getString("delay"));
                             }
+                            if(compound.hasKey("fuse")){
+                                fuse = Integer.parseInt(compound.getString("fuse"));
+                            }
+                            final int finalFuse = fuse;
                             Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
                                 @Override
                                 public void run() {
                                     TNTPrimed tnt = (TNTPrimed) player.getWorld().spawnEntity(event.getClickedBlock().getLocation(), EntityType.PRIMED_TNT);
-                                    tnt.setFuseTicks(0);
+                                    tnt.setFuseTicks(finalFuse);
                                 }
                             }, delay);
                             break;
@@ -146,14 +149,19 @@ public class NBTListener implements Listener {
                     switch (modifier){
                         case "explode":
                             int delay = 0;
+                            int fuse = 0;
                             if(compound.hasKey("delay")){
                                 delay = Integer.parseInt(compound.getString("delay"));
                             }
+                            if(compound.hasKey("fuse")){
+                                fuse = Integer.parseInt(compound.getString("fuse"));
+                            }
+                            final int finalFuse = fuse;
                             Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
                                 @Override
                                 public void run() {
                                     TNTPrimed tnt = (TNTPrimed) player.getWorld().spawnEntity(player.getLocation(), EntityType.PRIMED_TNT);
-                                    tnt.setFuseTicks(0);
+                                    tnt.setFuseTicks(finalFuse);
                                 }
                             }, delay);
                             break;

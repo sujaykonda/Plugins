@@ -1,16 +1,17 @@
 package me._xGQD.turtlegm.Event;
 
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class LeftClickPlayerEvent extends Event {
-    Player clickedPlayer;
+public class LeftClickEntityEvent extends Event {
+    Entity clickedEntity;
     Player player;
     static HandlerList HANDLERS = new HandlerList();
-    public LeftClickPlayerEvent(Player player, Player clickedPlayer){
+    public LeftClickEntityEvent(Player player, Entity clickedEntity){
         this.player = player;
-        this.clickedPlayer = clickedPlayer;
+        this.clickedEntity = clickedEntity;
     }
     @Override
     public HandlerList getHandlers() {
@@ -25,7 +26,7 @@ public class LeftClickPlayerEvent extends Event {
         return player;
     }
 
-    public Player getClickedPlayer(){
-        return clickedPlayer;
+    public Entity getClickedPlayer(){
+        return clickedEntity;
     }
 }
