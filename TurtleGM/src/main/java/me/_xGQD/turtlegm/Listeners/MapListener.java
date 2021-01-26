@@ -24,8 +24,11 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.Vector;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 public class MapListener implements Listener {
     Main plugin = JavaPlugin.getPlugin(Main.class);
@@ -35,6 +38,8 @@ public class MapListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onJoin(PlayerJoinEvent event){
         plugin.manager.join(event.getPlayer());
+        plugin.prevVelocity.put(event.getPlayer().getUniqueId(), event.getPlayer().getVelocity());
+
         Scoreboard scoreboard = ScoreboardLib.createScoreboard(event.getPlayer())
                 .setHandler(new ScoreboardHandler() {
                     @Override

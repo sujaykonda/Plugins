@@ -162,94 +162,96 @@ public class TGCommand implements CommandExecutor {
                 }
                 if(args.length == 3){
                     if(plugin.manager.isMap(args[1], args[2])){
-                        if(!plugin.manager.getMap(args[1], args[2]).opened && !plugin.manager.getMap(args[1], args[2]).started){
-                            plugin.manager.open(args[1], args[2]);
-                        }
-                        if(plugin.manager.getMap(args[1], args[2]).playerData.size() == 1){
-                            Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-                                @Override
-                                public void run() {
-                                    if(!plugin.manager.getMap(args[1], args[2]).started){
-                                        for(UUID playerUUID : plugin.manager.getMap(args[1], args[2]).playerData.keySet()) {
-                                            TitleAPI.sendTitle(Bukkit.getPlayer(playerUUID), 10, 20, 10, "15", null);
-                                        }
-                                    }
-                                    Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            if(!plugin.manager.getMap(args[1], args[2]).started){
-                                                for(UUID playerUUID : plugin.manager.getMap(args[1], args[2]).playerData.keySet()) {
-                                                    TitleAPI.sendTitle(Bukkit.getPlayer(playerUUID), 10, 20, 10, "10", null);
-                                                }
+                        if(!plugin.manager.getMap(args[1], args[2]).started){
+                            if(!plugin.manager.getMap(args[1], args[2]).opened && !plugin.manager.getMap(args[1], args[2]).started){
+                                plugin.manager.open(args[1], args[2]);
+                            }
+                            if(plugin.manager.getMap(args[1], args[2]).playerData.size() == 1){
+                                Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if(!plugin.manager.getMap(args[1], args[2]).started){
+                                            for(UUID playerUUID : plugin.manager.getMap(args[1], args[2]).playerData.keySet()) {
+                                                TitleAPI.sendTitle(Bukkit.getPlayer(playerUUID), 10, 20, 10, "15", null);
                                             }
-                                            Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    if(!plugin.manager.getMap(args[1], args[2]).started){
-                                                        for(UUID playerUUID : plugin.manager.getMap(args[1], args[2]).playerData.keySet()) {
-                                                            TitleAPI.sendTitle(Bukkit.getPlayer(playerUUID), 10, 20, 10, "5", null);
-                                                        }
-
-                                                        Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-                                                            @Override
-                                                            public void run() {
-                                                                if(!plugin.manager.getMap(args[1], args[2]).started){
-                                                                    for(UUID playerUUID : plugin.manager.getMap(args[1], args[2]).playerData.keySet()) {
-                                                                        TitleAPI.sendTitle(Bukkit.getPlayer(playerUUID), 10, 20, 10, "4", null);
-                                                                    }
-
-                                                                    Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-                                                                        @Override
-                                                                        public void run() {
-                                                                            if(!plugin.manager.getMap(args[1], args[2]).started){
-                                                                                for(UUID playerUUID : plugin.manager.getMap(args[1], args[2]).playerData.keySet()) {
-                                                                                    TitleAPI.sendTitle(Bukkit.getPlayer(playerUUID), 10, 20, 10, "3", null);
-                                                                                }
-
-                                                                                Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-                                                                                    @Override
-                                                                                    public void run() {
-                                                                                        if(!plugin.manager.getMap(args[1], args[2]).started){
-                                                                                            for(UUID playerUUID : plugin.manager.getMap(args[1], args[2]).playerData.keySet()) {
-                                                                                                TitleAPI.sendTitle(Bukkit.getPlayer(playerUUID), 10, 20, 10, "2", null);
-                                                                                            }
-
-                                                                                            Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-                                                                                                @Override
-                                                                                                public void run() {
-                                                                                                    if(!plugin.manager.getMap(args[1], args[2]).started){
-                                                                                                        for(UUID playerUUID : plugin.manager.getMap(args[1], args[2]).playerData.keySet()) {
-                                                                                                            TitleAPI.sendTitle(Bukkit.getPlayer(playerUUID), 10, 20, 10, "1", null);
-                                                                                                        }
-                                                                                                        Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-                                                                                                            @Override
-                                                                                                            public void run() {
-                                                                                                                plugin.manager.start(args[1], args[2]);
-                                                                                                            }
-                                                                                                        }, 20);
-                                                                                                    }
-                                                                                                }
-                                                                                        }, 20);
-                                                                                        }
-                                                                                    }
-                                                                                }, 20);
-                                                                            }
-                                                                        }
-                                                                    }, 20);
-                                                                }
-                                                            }
-                                                        }, 20);
+                                        }
+                                        Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                if(!plugin.manager.getMap(args[1], args[2]).started){
+                                                    for(UUID playerUUID : plugin.manager.getMap(args[1], args[2]).playerData.keySet()) {
+                                                        TitleAPI.sendTitle(Bukkit.getPlayer(playerUUID), 10, 20, 10, "10", null);
                                                     }
                                                 }
-                                            }, 100);
-                                        }
-                                    }, 100);
-                                }
-                            }, 300);
-                        }
+                                                Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        if(!plugin.manager.getMap(args[1], args[2]).started){
+                                                            for(UUID playerUUID : plugin.manager.getMap(args[1], args[2]).playerData.keySet()) {
+                                                                TitleAPI.sendTitle(Bukkit.getPlayer(playerUUID), 10, 20, 10, "5", null);
+                                                            }
 
-                        plugin.manager.joinMap(player, args[1], args[2]);
-                        commandSender.sendMessage("Joined the map");
+                                                            Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+                                                                @Override
+                                                                public void run() {
+                                                                    if(!plugin.manager.getMap(args[1], args[2]).started){
+                                                                        for(UUID playerUUID : plugin.manager.getMap(args[1], args[2]).playerData.keySet()) {
+                                                                            TitleAPI.sendTitle(Bukkit.getPlayer(playerUUID), 10, 20, 10, "4", null);
+                                                                        }
+
+                                                                        Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+                                                                            @Override
+                                                                            public void run() {
+                                                                                if(!plugin.manager.getMap(args[1], args[2]).started){
+                                                                                    for(UUID playerUUID : plugin.manager.getMap(args[1], args[2]).playerData.keySet()) {
+                                                                                        TitleAPI.sendTitle(Bukkit.getPlayer(playerUUID), 10, 20, 10, "3", null);
+                                                                                    }
+
+                                                                                    Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+                                                                                        @Override
+                                                                                        public void run() {
+                                                                                            if(!plugin.manager.getMap(args[1], args[2]).started){
+                                                                                                for(UUID playerUUID : plugin.manager.getMap(args[1], args[2]).playerData.keySet()) {
+                                                                                                    TitleAPI.sendTitle(Bukkit.getPlayer(playerUUID), 10, 20, 10, "2", null);
+                                                                                                }
+
+                                                                                                Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+                                                                                                    @Override
+                                                                                                    public void run() {
+                                                                                                        if(!plugin.manager.getMap(args[1], args[2]).started){
+                                                                                                            for(UUID playerUUID : plugin.manager.getMap(args[1], args[2]).playerData.keySet()) {
+                                                                                                                TitleAPI.sendTitle(Bukkit.getPlayer(playerUUID), 10, 20, 10, "1", null);
+                                                                                                            }
+                                                                                                            Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+                                                                                                                @Override
+                                                                                                                public void run() {
+                                                                                                                    plugin.manager.start(args[1], args[2]);
+                                                                                                                }
+                                                                                                            }, 20);
+                                                                                                        }
+                                                                                                    }
+                                                                                            }, 20);
+                                                                                            }
+                                                                                        }
+                                                                                    }, 20);
+                                                                                }
+                                                                            }
+                                                                        }, 20);
+                                                                    }
+                                                                }
+                                                            }, 20);
+                                                        }
+                                                    }
+                                                }, 100);
+                                            }
+                                        }, 100);
+                                    }
+                                }, 300);
+                            }
+
+                            plugin.manager.joinMap(player, args[1], args[2]);
+                            commandSender.sendMessage("Joined the map");
+                        }
                     }else{
                         commandSender.sendMessage("Map could not be found");
                     }

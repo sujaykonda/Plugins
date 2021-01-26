@@ -2,7 +2,7 @@ package me._xGQD.turtlegm.Listeners;
 
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
-import me._xGQD.turtlegm.Event.LeftClickEntityEvent;
+import me._xGQD.turtlegm.CustomEvent.LeftClickEntityEvent;
 import me._xGQD.turtlegm.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;

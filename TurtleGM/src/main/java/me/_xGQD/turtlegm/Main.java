@@ -16,7 +16,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.util.Vector;
 import org.inventivetalent.packetlistener.PacketListenerAPI;
 import org.inventivetalent.packetlistener.handler.PacketHandler;
 import org.inventivetalent.packetlistener.handler.ReceivedPacket;
@@ -29,6 +31,8 @@ import java.util.UUID;
 import java.util.logging.Level;
 
 public class Main extends JavaPlugin {
+
+    public HashMap<UUID, Vector> prevVelocity;
 
     public WorldEditPlugin wep;
     public WorldEdit we;
@@ -43,6 +47,8 @@ public class Main extends JavaPlugin {
             return;
         }
         ScoreboardLib.setPluginInstance(this);
+
+        prevVelocity = new HashMap<>();
 
         shops = new HashMap<>();
         shops.put("ctf", new CTFShop());

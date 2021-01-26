@@ -1,6 +1,6 @@
 package me._xGQD.turtlegm;
 
-import me._xGQD.turtlegm.Event.LeftClickEntityEvent;
+import me._xGQD.turtlegm.CustomEvent.LeftClickEntityEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;

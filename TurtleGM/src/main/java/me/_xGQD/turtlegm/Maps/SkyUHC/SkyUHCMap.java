@@ -494,7 +494,13 @@ public class SkyUHCMap extends Map {
                     @Override
                     public void run() {
                         event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 0));
-                        event.getPlayer().setItemInHand(null);
+                        ItemStack item = event.getPlayer().getItemInHand();
+                        item.setAmount(item.getAmount() - 1);
+                        if(item.getAmount() < 1){
+                            event.getPlayer().setItemInHand(null);
+                        }else{
+                            event.getPlayer().setItemInHand(item);
+                        }
                     }
                 });
             }

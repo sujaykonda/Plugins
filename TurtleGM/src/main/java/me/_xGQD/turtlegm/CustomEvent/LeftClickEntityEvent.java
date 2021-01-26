@@ -1,4 +1,4 @@
-package me._xGQD.turtlegm.Event;
+package me._xGQD.turtlegm.CustomEvent;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
