@@ -26,7 +26,7 @@ public class NBTListener implements Listener {
     public void onEntityClicked(LeftClickEntityEvent event){
         final Player player = event.getPlayer();
         final Entity hitEntity = event.getClickedPlayer();
-        if(player != null && player.getItemInHand() != null){
+        if(player != null && player.getItemInHand() != null && player.getItemInHand().getType().equals(Material.AIR)){
             NBTItem nbt = new NBTItem(player.getItemInHand());
             if(nbt.hasKey("onHit")){
                 NBTCompound eventCompound = nbt.getCompound("onHit");
