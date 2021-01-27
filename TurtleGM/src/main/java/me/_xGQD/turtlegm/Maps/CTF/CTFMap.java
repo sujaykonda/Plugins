@@ -610,7 +610,7 @@ public class CTFMap extends Map {
                     block.setType(type);
                     block.setData(data);
                 }
-            },1);
+            });
         }
     }
 

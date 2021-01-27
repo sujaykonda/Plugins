@@ -4,6 +4,7 @@ import me._xGQD.turtlegm.Maps.CTF.CTFMap;
 import me._xGQD.turtlegm.Maps.Map;
 import me._xGQD.turtlegm.Maps.RankedCTF.RankedCTFMap;
 import me._xGQD.turtlegm.Maps.SkyUHC.SkyUHCMap;
+import me._xGQD.turtlegm.Maps.StickFight.StickFightMap;
 import me._xGQD.turtlegm.Maps.UltimateCTF.UltimateCTFMap;
 import me._xGQD.turtlegm.scoreboard.common.EntryBuilder;
 import org.bukkit.Bukkit;
@@ -53,7 +54,8 @@ public class PlayerManager {
         map_icons.put("ctf", Material.BANNER);
         map_icons.put("uctf", Material.ENDER_PEARL);
         map_icons.put("rctf", Material.WOOL);
-        map_icons.put("skyuhc", Material.DIAMOND_ORE);
+        map_icons.put("skyuhc", Material.DIAMOND_ORE);;
+        map_icons.put("stickfight", Material.STICK);
 
         typesInventory = Bukkit.createInventory(null, 9);
         mapInventories = new HashMap<>();
@@ -62,15 +64,22 @@ public class PlayerManager {
         map_types.put("uctf", UltimateCTFMap.class);
         map_types.put("rctf", RankedCTFMap.class);
         map_types.put("skyuhc", SkyUHCMap.class);
+        map_types.put("stickfight", StickFightMap.class);
 
         typesInventory.setItem(0, ItemUtilities.createItem(map_icons.get("ctf"), "Capture The Flag", new String[]{}));
         typesInventory.setItem(1, ItemUtilities.createItem(map_icons.get("uctf"), "Ultimate Capture The Flag", new String[]{}));
         typesInventory.setItem(2, ItemUtilities.createItem(map_icons.get("rctf"), "Ranked Capture The Flag", new String[]{}));
         typesInventory.setItem(3, ItemUtilities.createItem(map_icons.get("skyuhc"), "SkyUHC", new String[]{}));
+        typesInventory.setItem(4, ItemUtilities.createItem(map_icons.get("stickfight"), "Stick Fight", new String[]{}));
 
         maps = new HashMap<>();
         playerPlace = new HashMap<>();
         playerElo = new HashMap<>();
+
+        for(String type : map_types.keySet()){
+            mapInventories.put(type, Bukkit.createInventory(null, 27));
+            maps.put(type, new HashMap<String, Map>());
+        }
 
         FileConfiguration mainConfig = plugin.getConfig();
         for(String uuid: mainConfig.getKeys(false)){
@@ -89,10 +98,6 @@ public class PlayerManager {
             config.load(file);
             String map_name = file.getName().substring(config.getString("type").length(), file.getName().length()-4);
             Class map_class = map_types.get(config.getString("type"));
-            if(!maps.containsKey(config.getString("type"))){
-                mapInventories.put(config.getString("type"), Bukkit.createInventory(null, 27));
-                maps.put(config.getString("type"), new HashMap<String, Map>());
-            }
             HashMap<String, Map> maps_with_types = maps.get(config.getString("type"));
             Map map = (Map) map_class.getConstructor(String.class, boolean.class).newInstance(map_name, true);
             ItemStack icon = ItemUtilities.createItem(map_icons.get(config.getString("type")), map_name, new String[]{});
@@ -279,11 +284,8 @@ public class PlayerManager {
     }
     public void createMap(String type, String name) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         Class map_class = map_types.get(type);
-        if(!maps.containsKey(type)){
-            maps.put(type, new HashMap<String, Map>());
-        }
-        HashMap<String, Map> maps_with_types = maps.get(type);
-        maps_with_types.put(name, (Map) map_class.getConstructor(String.class, boolean.class).newInstance(name, false));
+        System.out.println(map_class);
+        maps.get(type).put(name, (Map) map_class.getConstructor(String.class, boolean.class).newInstance(name, false));
 
     }
     public void removeMap(String type, String name){

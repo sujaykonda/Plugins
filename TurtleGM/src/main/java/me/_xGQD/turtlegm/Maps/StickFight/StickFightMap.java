@@ -2,6 +2,7 @@ package me._xGQD.turtlegm.Maps.StickFight;
 
 import com.connorlinfoot.titleapi.TitleAPI;
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitUtil;
@@ -11,6 +12,7 @@ import me._xGQD.turtlegm.Maps.CTF.CTFMap;
 import me._xGQD.turtlegm.Maps.Map;
 import me._xGQD.turtlegm.Maps.SkyUHC.SkyUHCPlayerData;
 import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -20,6 +22,7 @@ import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.entity.FishHook;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -54,7 +57,11 @@ public class StickFightMap extends Map {
     }
     @Override
     public void onJoin(Player player){
-        if(opened&&playerUUIDs.size()<2){
+        if(opened && playerUUIDs.size() < 2){
+            for(PotionEffect effect : player.getActivePotionEffects()){
+                player.removePotionEffect(effect.getType());
+            }
+            player.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 999999, 255));
             player.teleport(stick_spawns[playerUUIDs.size()]);
             playerUUIDs.add(player.getUniqueId());
             playerData.put(player.getUniqueId(), new SkyUHCPlayerData(playerUUIDs.size()));
@@ -71,14 +78,14 @@ public class StickFightMap extends Map {
             player.getInventory().setChestplate(null);
             player.getInventory().setHelmet(null);
             ItemStack stickkb = ItemUtilities.createItem(Material.STICK, "Knockback Stick", new String[]{""});
-                stickkb.addEnchantment(Enchantment.KNOCKBACK,1);
+            stickkb.addUnsafeEnchantment(Enchantment.KNOCKBACK,1);
             player.getInventory().addItem(stickkb);
         }
     }
 
     public void loadAll(){
         try {
-            stick_spawns = new Location[]{null, null, null, null};
+            stick_spawns = new Location[]{null, null};
 
             YamlConfiguration config = getConfig();
 
@@ -93,16 +100,6 @@ public class StickFightMap extends Map {
                     config.getDouble("loc2.x"),
                     config.getDouble("loc2.y"),
                     config.getDouble("loc2.z"));
-
-            stick_spawns[2] = new Location(bukkitWorld,
-                    config.getDouble("loc3.x"),
-                    config.getDouble("loc3.y"),
-                    config.getDouble("loc3.z"));
-
-            stick_spawns[3] = new Location(bukkitWorld,
-                    config.getDouble("loc4.x"),
-                    config.getDouble("loc4.y"),
-                    config.getDouble("loc4.z"));
 
             loadMap();
 
@@ -119,7 +116,6 @@ public class StickFightMap extends Map {
         playerUUIDs = new ArrayList<>();
 
         for(Location spawn : stick_spawns){
-            spawn.getWorld().getBlockAt(spawn.getBlockX(), spawn.getBlockY()-1, spawn.getBlockZ()).setType(Material.BARRIER);
             spawn.getWorld().getBlockAt(spawn.getBlockX(), spawn.getBlockY()+2, spawn.getBlockZ()).setType(Material.BARRIER);
             spawn.getWorld().getBlockAt(spawn.getBlockX()+1, spawn.getBlockY()+1, spawn.getBlockZ()).setType(Material.BARRIER);
             spawn.getWorld().getBlockAt(spawn.getBlockX()-1, spawn.getBlockY()+1, spawn.getBlockZ()).setType(Material.BARRIER);
@@ -200,23 +196,20 @@ public class StickFightMap extends Map {
                 }
                 player.sendMessage("You have set the spawn");
             }
-
             saveConfig(config);
         } catch (IOException | InvalidConfigurationException e) {
             e.printStackTrace();
         }
     }
+
+    @Override
+    public void onPlayerDamageByPlayer(EntityDamageByEntityEvent event, Player player, Player cause) {
+        event.setDamage(0);
+    }
+
     @Override
     public void onPlayerDamage(EntityDamageEvent event, final Player player){
         if(event.getCause().equals(EntityDamageEvent.DamageCause.VOID)){
-            if(event instanceof EntityDamageByEntityEvent){
-                EntityDamageByEntityEvent e = (EntityDamageByEntityEvent) event;
-                if(e.getDamager() instanceof Player){
-                    Player damager = (Player) e.getDamager();
-                    ExperienceOrb orb = (ExperienceOrb) damager.getWorld().spawnEntity(player.getLocation(), EntityType.EXPERIENCE_ORB);
-                    orb.setExperience(10);
-                }
-            }
             event.setCancelled(true);
             for(PotionEffect effect : player.getActivePotionEffects()){
                 player.removePotionEffect(effect.getType());
@@ -251,8 +244,21 @@ public class StickFightMap extends Map {
         if(event.getCause().equals(EntityDamageEvent.DamageCause.FALL)){
             event.setCancelled(true);
         }
-        if (event.getCause().equals(EntityDamageEvent.DamageCause.CONTACT)){
-            event.setDamage(0);
-        }
+    }
+
+    @Override
+    public void onBlockBreak(BlockBreakEvent event) { final Block block = event.getBlock();
+        Player player = event.getPlayer();
+        final Material type = block.getType();
+        final Byte data = block.getData();
+        block.setType(Material.AIR);
+        player.sendMessage("You cannot break this block");
+        Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+            @Override
+            public void run() {
+                block.setType(type);
+                block.setData(data);
+            }
+        });
     }
 }

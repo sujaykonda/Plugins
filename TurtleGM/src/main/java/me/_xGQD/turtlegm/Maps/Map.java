@@ -67,9 +67,13 @@ public class Map {
     public YamlConfiguration getConfig() throws IOException, InvalidConfigurationException {
         File maps_dir = new File(plugin.getDataFolder(), "/maps");
         if (!maps_dir.exists())
-            maps_dir.mkdirs();
+            maps_dir.mkdir();
 
         File map_file = new File(plugin.getDataFolder(), "/maps/" + getMapType() + name + ".yml");
+
+        if(!map_file.exists()){
+            map_file.createNewFile();
+        }
 
         YamlConfiguration config = new YamlConfiguration();
 
@@ -88,12 +92,16 @@ public class Map {
         config.save(map_file);
     }
 
-    public File getSchematicFile(){
+    public File getSchematicFile() throws IOException {
         File schematics_dir = new File(plugin.getDataFolder(), "/schematics");
         if (!schematics_dir.exists())
             schematics_dir.mkdirs();
+        File schem_file = new File(plugin.getDataFolder(), "/schematics/" + getMapType() + name + ".schematic");
 
-        return new File(plugin.getDataFolder(), "/schematics/" + getMapType() + name + ".schematic");
+        if(schem_file.exists()){
+            schem_file.createNewFile();
+        }
+        return schem_file;
     }
 
     public void changeSettings(String[] args, CommandSender commandSender){ }
@@ -154,7 +162,7 @@ public class Map {
 
             config.set("paste_location.world", plugin.wep.getSelection(player).getMinimumPoint().getWorld().getName());
 
-            config.set("type", getType());
+            config.set("type", getMapType());
 
             saveConfig(config);
 
