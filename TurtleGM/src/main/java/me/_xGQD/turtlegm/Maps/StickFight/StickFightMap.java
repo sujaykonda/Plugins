@@ -51,8 +51,7 @@ public class StickFightMap extends Map {
             player.getInventory().setLeggings(null);
             player.getInventory().setChestplate(null);
             player.getInventory().setHelmet(null);
-            ItemStack stickkb = ItemUtilities.createItem((new ItemStack(Material.STICK),
-            "Knockback Stick");
+            ItemStack stickkb = ItemUtilities.createItem((new ItemStack(Material.STICK), "Knockback Stick"));
             stickkb.addEnchantment(Enchantment.KNOCKBACK,1);
             player.getInventory().addItem(stickkb);
         }
