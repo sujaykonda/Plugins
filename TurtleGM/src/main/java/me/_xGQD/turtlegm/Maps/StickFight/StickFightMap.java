@@ -10,6 +10,7 @@ import com.sk89q.worldedit.function.operation.Operations;
 import me._xGQD.turtlegm.ItemUtilities;
 import me._xGQD.turtlegm.Maps.CTF.CTFMap;
 import me._xGQD.turtlegm.Maps.Map;
+import me._xGQD.turtlegm.Maps.PlayerData;
 import me._xGQD.turtlegm.Maps.SkyUHC.SkyUHCPlayerData;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -26,6 +27,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -260,5 +262,30 @@ public class StickFightMap extends Map {
                 block.setData(data);
             }
         });
+    }
+    @Override
+    public void onPlayerMove(PlayerMoveEvent event){
+        if(Bukkit.getPlayer(playerUUIDs.get(0)).getLocation().getY()>Bukkit.getPlayer(playerUUIDs.get(1)).getLocation().getY()+5){
+            Bukkit.getPlayer(playerUUIDs.get(0)).getWorld().getBlockAt((int)(Math.round(Bukkit.getPlayer(playerUUIDs.get(0)).getLocation().getX())), (int)Math.round(Bukkit.getPlayer(playerUUIDs.get(0)).getLocation().getY())-1,(int) Math.round(Bukkit.getPlayer(playerUUIDs.get(0)).getLocation().getZ())).setType(Material.AIR);
+            Bukkit.getPlayer(playerUUIDs.get(0)).getWorld().getBlockAt((int)(Math.round(Bukkit.getPlayer(playerUUIDs.get(0)).getLocation().getX())), (int)Math.round(Bukkit.getPlayer(playerUUIDs.get(0)).getLocation().getY())-1,(int) Math.round(Bukkit.getPlayer(playerUUIDs.get(0)).getLocation().getZ())+1).setType(Material.AIR);
+            Bukkit.getPlayer(playerUUIDs.get(0)).getWorld().getBlockAt((int)(Math.round(Bukkit.getPlayer(playerUUIDs.get(0)).getLocation().getX())), (int)Math.round(Bukkit.getPlayer(playerUUIDs.get(0)).getLocation().getY())-1,(int) Math.round(Bukkit.getPlayer(playerUUIDs.get(0)).getLocation().getZ())-1).setType(Material.AIR);
+            Bukkit.getPlayer(playerUUIDs.get(0)).getWorld().getBlockAt((int)(Math.round(Bukkit.getPlayer(playerUUIDs.get(0)).getLocation().getX()))+1, (int)Math.round(Bukkit.getPlayer(playerUUIDs.get(0)).getLocation().getY())-1,(int) Math.round(Bukkit.getPlayer(playerUUIDs.get(0)).getLocation().getZ())).setType(Material.AIR);
+            Bukkit.getPlayer(playerUUIDs.get(0)).getWorld().getBlockAt((int)(Math.round(Bukkit.getPlayer(playerUUIDs.get(0)).getLocation().getX()))-1, (int)Math.round(Bukkit.getPlayer(playerUUIDs.get(0)).getLocation().getY())-1,(int) Math.round(Bukkit.getPlayer(playerUUIDs.get(0)).getLocation().getZ())).setType(Material.AIR);
+            Bukkit.getPlayer(playerUUIDs.get(0)).getWorld().getBlockAt((int)(Math.round(Bukkit.getPlayer(playerUUIDs.get(0)).getLocation().getX()))+1, (int)Math.round(Bukkit.getPlayer(playerUUIDs.get(0)).getLocation().getY())-1,(int) Math.round(Bukkit.getPlayer(playerUUIDs.get(0)).getLocation().getZ())-1).setType(Material.AIR);
+            Bukkit.getPlayer(playerUUIDs.get(0)).getWorld().getBlockAt((int)(Math.round(Bukkit.getPlayer(playerUUIDs.get(0)).getLocation().getX()))+1, (int)Math.round(Bukkit.getPlayer(playerUUIDs.get(0)).getLocation().getY())-1,(int) Math.round(Bukkit.getPlayer(playerUUIDs.get(0)).getLocation().getZ())+1).setType(Material.AIR);
+            Bukkit.getPlayer(playerUUIDs.get(0)).getWorld().getBlockAt((int)(Math.round(Bukkit.getPlayer(playerUUIDs.get(0)).getLocation().getX()))-1, (int)Math.round(Bukkit.getPlayer(playerUUIDs.get(0)).getLocation().getY())-1,(int) Math.round(Bukkit.getPlayer(playerUUIDs.get(0)).getLocation().getZ())+1).setType(Material.AIR);
+            Bukkit.getPlayer(playerUUIDs.get(0)).getWorld().getBlockAt((int)(Math.round(Bukkit.getPlayer(playerUUIDs.get(0)).getLocation().getX()))-1, (int)Math.round(Bukkit.getPlayer(playerUUIDs.get(0)).getLocation().getY())-1,(int) Math.round(Bukkit.getPlayer(playerUUIDs.get(0)).getLocation().getZ())-1).setType(Material.AIR);
+        }
+        if(Bukkit.getPlayer(playerUUIDs.get(1)).getLocation().getY()>Bukkit.getPlayer(playerUUIDs.get(0)).getLocation().getY()+5){
+            Bukkit.getPlayer(playerUUIDs.get(1)).getWorld().getBlockAt((int)(Math.round(Bukkit.getPlayer(playerUUIDs.get(1)).getLocation().getX())), (int)Math.round(Bukkit.getPlayer(playerUUIDs.get(1)).getLocation().getY())-1,(int) Math.round(Bukkit.getPlayer(playerUUIDs.get(1)).getLocation().getZ())).setType(Material.AIR);
+            Bukkit.getPlayer(playerUUIDs.get(1)).getWorld().getBlockAt((int)(Math.round(Bukkit.getPlayer(playerUUIDs.get(1)).getLocation().getX())), (int)Math.round(Bukkit.getPlayer(playerUUIDs.get(1)).getLocation().getY())-1,(int) Math.round(Bukkit.getPlayer(playerUUIDs.get(1)).getLocation().getZ())+1).setType(Material.AIR);
+            Bukkit.getPlayer(playerUUIDs.get(1)).getWorld().getBlockAt((int)(Math.round(Bukkit.getPlayer(playerUUIDs.get(1)).getLocation().getX())), (int)Math.round(Bukkit.getPlayer(playerUUIDs.get(1)).getLocation().getY())-1,(int) Math.round(Bukkit.getPlayer(playerUUIDs.get(1)).getLocation().getZ())-1).setType(Material.AIR);
+            Bukkit.getPlayer(playerUUIDs.get(1)).getWorld().getBlockAt((int)(Math.round(Bukkit.getPlayer(playerUUIDs.get(1)).getLocation().getX()))+1, (int)Math.round(Bukkit.getPlayer(playerUUIDs.get(1)).getLocation().getY())-1,(int) Math.round(Bukkit.getPlayer(playerUUIDs.get(1)).getLocation().getZ())).setType(Material.AIR);
+            Bukkit.getPlayer(playerUUIDs.get(1)).getWorld().getBlockAt((int)(Math.round(Bukkit.getPlayer(playerUUIDs.get(1)).getLocation().getX()))-1, (int)Math.round(Bukkit.getPlayer(playerUUIDs.get(1)).getLocation().getY())-1,(int) Math.round(Bukkit.getPlayer(playerUUIDs.get(1)).getLocation().getZ())).setType(Material.AIR);
+            Bukkit.getPlayer(playerUUIDs.get(1)).getWorld().getBlockAt((int)(Math.round(Bukkit.getPlayer(playerUUIDs.get(1)).getLocation().getX()))+1, (int)Math.round(Bukkit.getPlayer(playerUUIDs.get(1)).getLocation().getY())-1,(int) Math.round(Bukkit.getPlayer(playerUUIDs.get(1)).getLocation().getZ())-1).setType(Material.AIR);
+            Bukkit.getPlayer(playerUUIDs.get(1)).getWorld().getBlockAt((int)(Math.round(Bukkit.getPlayer(playerUUIDs.get(1)).getLocation().getX()))+1, (int)Math.round(Bukkit.getPlayer(playerUUIDs.get(1)).getLocation().getY())-1,(int) Math.round(Bukkit.getPlayer(playerUUIDs.get(1)).getLocation().getZ())+1).setType(Material.AIR);
+            Bukkit.getPlayer(playerUUIDs.get(1)).getWorld().getBlockAt((int)(Math.round(Bukkit.getPlayer(playerUUIDs.get(1)).getLocation().getX()))-1, (int)Math.round(Bukkit.getPlayer(playerUUIDs.get(1)).getLocation().getY())-1,(int) Math.round(Bukkit.getPlayer(playerUUIDs.get(1)).getLocation().getZ())+1).setType(Material.AIR);
+            Bukkit.getPlayer(playerUUIDs.get(1)).getWorld().getBlockAt((int)(Math.round(Bukkit.getPlayer(playerUUIDs.get(1)).getLocation().getX()))-1, (int)Math.round(Bukkit.getPlayer(playerUUIDs.get(1)).getLocation().getY())-1,(int) Math.round(Bukkit.getPlayer(playerUUIDs.get(1)).getLocation().getZ())-1).setType(Material.AIR);
+        }
     }
 }
