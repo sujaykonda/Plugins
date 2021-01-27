@@ -125,6 +125,11 @@ public class MapListener implements Listener {
                     event.getWhoClicked().closeInventory();
                     event.getWhoClicked().openInventory(plugin.manager.mapInventories.get("skyuhc"));
                     break;
+                case STICK:
+                    event.setCancelled(true);
+                    event.getWhoClicked().closeInventory();
+                    event.getWhoClicked().openInventory(plugin.manager.mapInventories.get("stickfight"));
+                    break;
             }
         }
         for(String map_type : plugin.manager.mapInventories.keySet()){
