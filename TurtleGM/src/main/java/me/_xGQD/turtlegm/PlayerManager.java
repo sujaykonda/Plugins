@@ -185,9 +185,10 @@ public class PlayerManager {
         }
 
         Map map = getMap(type, name);
-        map.onJoin(player);
-        setMap(type, name, map);
-        playerPlace.put(player.getUniqueId(), type + " " + name);
+        if(map.onJoin(player)){
+            setMap(type, name, map);
+            playerPlace.put(player.getUniqueId(), type + " " + name);
+        }
     }
 
     public void changeSettings(String[] args, CommandSender commandSender, String type, String name){

@@ -69,7 +69,7 @@ public class SkyUHCMap extends Map {
     }
 
     @Override
-    public void onJoin(Player player){
+    public boolean onJoin(Player player){
         if(opened && playerUUIDs.size() < 4){
             player.teleport(island_spawns[playerUUIDs.size()]);
             playerUUIDs.add(player.getUniqueId());
@@ -89,7 +89,10 @@ public class SkyUHCMap extends Map {
             player.getInventory().setChestplate(null);
             player.getInventory().setHelmet(null);
             plugin.shops.get("skyuhckits").open(player);
+
+            return true;
         }
+        return false;
     }
 
     @Override

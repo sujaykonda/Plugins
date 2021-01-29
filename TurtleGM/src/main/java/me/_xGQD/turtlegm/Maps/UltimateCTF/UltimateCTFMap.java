@@ -33,7 +33,7 @@ public class UltimateCTFMap extends CTFMap {
         }
     }
     @Override
-    public void onJoin(Player player){
+    public boolean onJoin(Player player){
         if(opened){
             File file = new File(plugin.getDataFolder(), "/" + player.getUniqueId().toString() + ".yml");
             if(file.exists() && YamlConfiguration.loadConfiguration(file).getConfigurationSection("ctf") != null){
@@ -51,7 +51,9 @@ public class UltimateCTFMap extends CTFMap {
                 team_count_2 += 1;
             }
             plugin.shops.get("uctfPerks").open(player);
+            return true;
         }
+        return false;
     }
     @Override
     public void onPlayerInteract(PlayerInteractEvent event){

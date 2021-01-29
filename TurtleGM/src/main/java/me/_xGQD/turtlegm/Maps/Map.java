@@ -56,7 +56,7 @@ public class Map {
         playerData = new HashMap<>();
     }
 
-    public void onJoin(Player player) { }
+    public boolean onJoin(Player player) { return false; }
     public static String getType(){
         return "map";
     }

@@ -292,7 +292,7 @@ public class CTFMap extends Map {
         }
     }
     @Override
-    public void onJoin(Player player){
+    public boolean onJoin(Player player){
         if(opened){
             File file = new File(plugin.getDataFolder(), "/kits/" + player.getUniqueId().toString() + ".yml");
             if(file.exists() && YamlConfiguration.loadConfiguration(file).getConfigurationSection(getType()) != null){
@@ -314,7 +314,9 @@ public class CTFMap extends Map {
                     team_count_2 += 1;
                 }
             }
+            return true;
         }
+        return false;
     }
 
     @Override
